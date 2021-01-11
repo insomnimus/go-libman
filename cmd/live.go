@@ -614,6 +614,10 @@ func parseLiveCommand(s string) {
 		syncCache()
 		case "h", "help":
 		helpLive(fields[1:])
+		case "show", "display":
+		show(fields[1:])
+		case "caches":
+		listCaches()
 		default:
 		fmt.Printf("unknown command %q\n", concat(fields[1:]))
 	}
@@ -733,7 +737,13 @@ temp:= &Playlist{Name: selectedSimple.Name, ID: selectedSimple.ID.String()}
 		return
 	}
 	temp.Commit()
-	fmt.Println("returning")
+	fmt.Println("would you like to empty the cache? (y/n)")
+	if yesOrNo(){
+		selectedCache.Tracks= nil
+		fmt.Println("emptyed")
+		return
+	}
+	fmt.Println("did not empty, returning")
 }
 
 func liveCleanup(){
@@ -805,6 +815,90 @@ func helpLive(_ []string) {
 	
 	#load/cache
 	load a cache
+	
+	#list cache|playlist
+	list the selected playlists or caches tracks
+	
+	#caches
+	show the list of caches
 	`
 	fmt.Println(msg)
+}
+
+func show(args []string) {
+	if len(args) != 0{
+		switch strings.ToLower(args[0]){
+			case "cache", "c", "cac":
+			showCache(args[1:])
+			case "p", "playlist", "play", "pl":
+			showPlaylist(args[1:])
+			default:
+			fmt.Printf("unknown argument %s, arguments are:\nplaylist (p, pl, play)\ncache (c, cac)\n", args[0])
+			return
+		}
+	}
+}
+
+func showPlaylist(args []string) {
+	if len(args)==0{
+		if selectedSimple== nil{
+			fmt.Println("you must select a playlist first")
+			return
+		}
+		results, err:= client.GetPlaylistTracks(selectedSimple.ID)
+		if err!=nil{
+			fmt.Fprintf(os.Stderr, "error fetching the tracks for %s: %s\n", selectedSimple.Name, err)
+			return
+		}
+		if len(results.Tracks)==0{
+			fmt.Printf("%s has no tracks in it\n", selectedSimple.Name)
+			return
+		}
+		for i, t:= range results.Tracks{
+			if i==40{
+				fmt.Println("use `edit` to potentially see more tracks")
+			}
+			artists:= ""
+			for _, art:= range t.Track.Artists{
+				artists+= art.Name + ", "
+			}
+			fmt.Printf("%d- %s by %s\n", i, t.Track.Name, artists)
+		}
+		fmt.Println("returning")
+		return
+	}
+	name:= concat(args)
+	results, err:= client.CurrentUsersPlaylists()
+	if err!=nil{
+		fmt.Fprintf(os.Stderr, "error fetching playlists: %s\n", err)
+		return
+	}
+	if len(results.Playlists)==0{
+		fmt.Println("no playlist found")
+		return
+	}
+	for _, pl:= range results.Playlists{
+		if strings.EqualFold(pl.Name, name) {
+			tracks, err:= client.GetPlaylistTracks(pl.ID)
+			if err!=nil{
+				fmt.Fprintf(os.Stderr, "error fetching the tracks for %s: %s\n", pl.Name, err)
+				return
+			}
+			if len(tracks.Tracks)==0{
+				fmt.Printf("%s has no tracks in it\n", pl.Name)
+				return
+			}
+			for i, t:= range tracks.Tracks{
+				if i== 40{
+					fmt.Println("to see more tracks, use `edit`")
+					return
+				}
+				artists:= ""
+				for _, art:= range t.Track.Artists{
+					artists+= art.Name + ", "
+				}
+				fmt.Printf("%d- %s by %s\n", i, t.Track.Name, artists)
+			}
+		}
+	}
 }

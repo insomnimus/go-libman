@@ -472,3 +472,27 @@ func(c *Cache) Edit() {
 	}
 }
 
+func(c *Cache) List() {
+		for i, t:= range c.Tracks{
+		fmt.Printf("%d- %s\n", i, t)
+	}
+}
+
+func showCache(args []string) {
+	if len(args) !=0{
+		name:= concat(args)
+		for _, c:= range caches{
+			if strings.EqualFold(name, c.Name){
+				c.List()
+				return
+			}
+		}
+		fmt.Printf("there is no cache with name %s\n", name)
+		return
+	}
+	if selectedCache==nil{
+		fmt.Println("you must select a cache first")
+		return
+	}
+	selectedCache.List()
+}

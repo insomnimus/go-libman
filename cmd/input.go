@@ -92,6 +92,8 @@ func parseSearchCommand(input string) {
 		deleteCache(fields[1:])
 		case "e", "edit":
 		editCache(fields[1:])
+		case "list", "l":
+		showCache(fields[1:])
 		default:
 		fmt.Printf("unknown command %q\n", fields[0])
 	}
@@ -116,6 +118,12 @@ func searchHelp(_ []string) {
 		example:
 		new
 		create metal
+		
+		#list [cache name]: list the contents of a cache
+		the name can be omitted to list the selected cache
+		(l)
+		example:
+		list metal
 		
 		#choose [cache name]: choose a cache
 		the name can be omitted to get an interactive screen
