@@ -125,7 +125,7 @@ func(c *Cache) Add(song spotify.FullTrack) {
 }
 
 func(c *Cache) String() string{
-	return fmt.Sprintf("%s (%d tracks)\n", c.Name, len(c.Tracks))
+	return fmt.Sprintf("%s (%d tracks)", c.Name, len(c.Tracks))
 }
 
 func initDB() {
