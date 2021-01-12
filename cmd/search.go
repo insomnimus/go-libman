@@ -119,10 +119,10 @@ func chooseCache(args []string) {
 		fmt.Printf("%d- %s\n", i, c)
 	}
 	input:= ""
-	index:= 0
+	
 	for{
 		input= prompt()
-		if input=="" || input== "-1{
+		if input=="" || input== "-1"{
 			fmt.Println("returning")
 			return
 		}
@@ -177,7 +177,7 @@ func createCache(args []string) {
 			return
 		}
 		if len(caches)==0{
-			c:= &cache{Name: name}
+			c:= &Cache{Name: name}
 			selectedCache= c
 			caches= append(caches, c)
 			fmt.Printf("created and selected cache %s\n", c.Name)
