@@ -107,6 +107,7 @@ func chooseCache(args []string) {
 			if c.Name== name{
 				selectedCache= c
 				fmt.Printf("selected cache %s\n", name)
+				return
 			}
 		}
 		fmt.Printf("there are no caches with the name %s, create one with `new %s`\n", name, name)
@@ -121,26 +122,23 @@ func chooseCache(args []string) {
 	index:= 0
 	for{
 		input= prompt()
-		if input== ""{
+		if input=="" || input== "-1{
 			fmt.Println("returning")
+			return
 		}
 		index, err:= strconv.Atoi(input)
 		if err!=nil{
 			fmt.Println("invalid input, try again:")
 			continue
 		}
-		if index== -1{
-			fmt.Println("returning")
-			return
-		}
 		if index< 0 || index> len(caches){
 			fmt.Printf("invalid input, enter between 0 and %d, enter -1 or blank to return:\n", len(caches)-1)
 			continue
 		}
-		break
+		selectedCache= caches[index]
+		fmt.Printf("selected cache %s\n", selectedCache.Name)
+		return
 	}
-	selectedCache= caches[index]
-	fmt.Printf("selected %s\n", selectedCache.Name)
 }
 
 func createCache(args []string) {
@@ -148,10 +146,11 @@ func createCache(args []string) {
 		name:= concat(args)
 		for _, c:= range caches{
 			if c.Name== name{
-				fmt.Printf("there is already a cache with the name %s, select it instead? y/n\n")
+				fmt.Printf("there is already a cache with the name %s, select it instead? (y/n)\n")
 				if yesOrNo(){
 					selectedCache= c
 					fmt.Printf("selected cache %s\n", name)
+					return
 				}
 				fmt.Println("not created, returning")
 				return
@@ -159,6 +158,7 @@ func createCache(args []string) {
 		}
 		c:= &Cache{Name: name}
 		caches= append(caches, c)
+		selectedCache= c
 		fmt.Printf("created and selected new cache %s\n", name)
 		return
 	}
@@ -168,12 +168,20 @@ func createCache(args []string) {
 	for{
 		fmt.Println("enter name:")
 		name= prompt()
+		if name== ""{
+			fmt.Println("cancelled")
+			return
+		}
 		if strings.EqualFold(name, "exit") || strings.EqualFold(name, "cancel"){
 			fmt.Println("canceled")
 			return
 		}
 		if len(caches)==0{
-			break
+			c:= &cache{Name: name}
+			selectedCache= c
+			caches= append(caches, c)
+			fmt.Printf("created and selected cache %s\n", c.Name)
+			return
 		}
 		for _, c:= range caches{
 			if name== c.Name{
@@ -183,7 +191,8 @@ func createCache(args []string) {
 					fmt.Printf("selected cache %s\n", c.Name)
 					return
 				}
-				break
+				fmt.Println("cancelled")
+				return
 			}
 		}
 	}
