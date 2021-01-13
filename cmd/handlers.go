@@ -23,14 +23,20 @@ func parsePlayerCommand(s string) {
 	
 	switch strings.ToLower(fields[0]){
 	case "play":
-	playTrack(fields[1:])
+	play(fields[1:])
+	case "search", "s":
+	if len(fields)==1{
+		fmt.Println("missing argument for search")
+		return
+	}
+	play(fields[1:])
 	case "pause":
 	pause()
 	case ">", "next", "n":
 	playNext()
 	case "<", "prev", "previous":
 	playPrev()
-	case "add":
+	case "add", "save", "saveto":
 	saveCurrentlyPlaying(fields[1:])
 	case "h", "help":
 	playerHelp()
@@ -38,6 +44,8 @@ func parsePlayerCommand(s string) {
 	changeVolume("-100")
 	case "what", "?":
 	showCurrentlyPlaying()
+	case "playlists", "pl":
+	playUserPlaylist(fields[1:])
 	case "volume", "vol":
 	volume(fields[1:])
 	default:
@@ -46,7 +54,30 @@ func parsePlayerCommand(s string) {
 }
 
 func playerHelp() {
-	msg:= `commands:
+	msg:= `
+	you can enter blank to play/pause
+	you can change the volume by doing - or + followed by a number
+	you can play next/prev song with >/< or next/prev
+	
+	
+	
+	commands:
+	#play/search <name>
+	search for anything, then if you want to, play it
+	
+	#volume <percentage>
+	set the volume
+	
+	#what
+	show currently playing
+	
+	#save/add [playlist name]
+	save currently playing to a playlist
+	
+	#playlists/pl [playlist name]
+	play one of your playlists
+	#mute
+	mute
 	`
 	fmt.Println(msg)
 }
