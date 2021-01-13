@@ -20,7 +20,26 @@ const redirectURI = "http://localhost:8080/callback"
 
 var (
 user *spotify.PrivateUser
-	auth  = spotify.NewAuthenticator(redirectURI, spotify.ScopeUserReadPrivate, spotify.ScopePlaylistModifyPublic, spotify.ScopePlaylistModifyPrivate, spotify.ScopeUserLibraryModify, spotify.ScopeUserLibraryRead, spotify.ScopePlaylistReadPrivate)
+	// all the permissions
+	auth  = spotify.NewAuthenticator(redirectURI,
+	spotify.ScopeImageUpload,
+spotify.ScopePlaylistReadPrivate,
+spotify.ScopePlaylistModifyPublic,
+spotify.ScopePlaylistModifyPrivate,
+spotify.ScopePlaylistReadCollaborative,
+spotify.ScopeUserFollowModify,
+spotify.ScopeUserFollowRead,
+spotify.ScopeUserLibraryModify,
+spotify.ScopeUserLibraryRead,
+spotify.ScopeUserReadPrivate,
+spotify.ScopeUserReadEmail,
+spotify.ScopeUserReadCurrentlyPlaying,
+spotify.ScopeUserReadPlaybackState,
+spotify.ScopeUserModifyPlaybackState,
+spotify.ScopeUserReadRecentlyPlayed,
+spotify.ScopeUserTopRead,
+spotify.ScopeStreaming,
+)
 	ch    = make(chan *spotify.Client)
 	state = "abc123"
 )
@@ -175,7 +194,7 @@ func initClient(token *oauth2.Token) {
 		os.Exit(1)
 	}
 	user= usr
-	fmt.Println("logged in")
+	fmt.Printf("welcome %s\n", user.DisplayName)
 }
 
 func choosePlaylist(args []string) {
@@ -649,10 +668,6 @@ func createPlaylist() {
 	fmt.Printf("created playlist %s, select it with `select`\n", name)
 }
 
-func deletePlaylist() {
-	fmt.Println("not supported yet")
-}
-
 func loadCache(args []string) {
 	if len(caches)==0{
 		fmt.Println("you don't have any caches, use `libman search` to manage local caches")
@@ -695,55 +710,6 @@ func loadCache(args []string) {
 		fmt.Printf("loaded cache %s\n", selectedCache.Name)
 		return
  	}
-}
-
-func syncCache() {
-	if selectedCache== nil{
-		fmt.Println("you must load a cache first with `load`")
-		return
-	}
-	if selectedSimple== nil{
-		fmt.Println("you must first select a playlist with `select`")
-		return
-	}
-	if len(selectedCache.Tracks)== 0{
-		fmt.Printf("cache %s has no tracks in it.\n", selectedCache.Name)
-		return
-	}
-	plTracks, err:= client.GetPlaylistTracks(selectedSimple.ID)
-	if err!=nil{
-		fmt.Fprintf(os.Stderr, "error fetching playlist %s: %s\n", selectedSimple.Name, err)
-		return
-	}
-temp:= &Playlist{Name: selectedSimple.Name, ID: selectedSimple.ID.String()}
-	LOOP:
-	for _, track:= range selectedCache.Tracks{
-	for _, t:= range plTracks.Tracks{
-		if string(t.Track.ID)== track.ID{
-		temp.Tracks= append(temp.Tracks, track)
-		continue LOOP
-		}
-	}
-	temp.addCache= append(temp.addCache, track)
-	}
-	if len(temp.Tracks)== len(plTracks.Tracks){
-		fmt.Printf("cache %s doesn't have any new tracks, no changes made\nwould you like to empty the cache? y/n\n", selectedCache.Name)
-		if yesOrNo(){
-			selectedCache.Tracks= nil
-			fmt.Printf("emptyed %s\n", selectedCache.Name)
-			return
-		}
-		fmt.Println("returning")
-		return
-	}
-	temp.Commit()
-	fmt.Println("would you like to empty the cache? (y/n)")
-	if yesOrNo(){
-		selectedCache.Tracks= nil
-		fmt.Println("emptyed")
-		return
-	}
-	fmt.Println("did not empty, returning")
 }
 
 func liveCleanup(){
@@ -835,70 +801,6 @@ func show(args []string) {
 			default:
 			fmt.Printf("unknown argument %s, arguments are:\nplaylist (p, pl, play)\ncache (c, cac)\n", args[0])
 			return
-		}
-	}
-}
-
-func showPlaylist(args []string) {
-	if len(args)==0{
-		if selectedSimple== nil{
-			fmt.Println("you must select a playlist first")
-			return
-		}
-		results, err:= client.GetPlaylistTracks(selectedSimple.ID)
-		if err!=nil{
-			fmt.Fprintf(os.Stderr, "error fetching the tracks for %s: %s\n", selectedSimple.Name, err)
-			return
-		}
-		if len(results.Tracks)==0{
-			fmt.Printf("%s has no tracks in it\n", selectedSimple.Name)
-			return
-		}
-		for i, t:= range results.Tracks{
-			if i==40{
-				fmt.Println("use `edit` to potentially see more tracks")
-			}
-			artists:= ""
-			for _, art:= range t.Track.Artists{
-				artists+= art.Name + ", "
-			}
-			fmt.Printf("%d- %s by %s\n", i, t.Track.Name, artists)
-		}
-		fmt.Println("returning")
-		return
-	}
-	name:= concat(args)
-	results, err:= client.CurrentUsersPlaylists()
-	if err!=nil{
-		fmt.Fprintf(os.Stderr, "error fetching playlists: %s\n", err)
-		return
-	}
-	if len(results.Playlists)==0{
-		fmt.Println("no playlist found")
-		return
-	}
-	for _, pl:= range results.Playlists{
-		if strings.EqualFold(pl.Name, name) {
-			tracks, err:= client.GetPlaylistTracks(pl.ID)
-			if err!=nil{
-				fmt.Fprintf(os.Stderr, "error fetching the tracks for %s: %s\n", pl.Name, err)
-				return
-			}
-			if len(tracks.Tracks)==0{
-				fmt.Printf("%s has no tracks in it\n", pl.Name)
-				return
-			}
-			for i, t:= range tracks.Tracks{
-				if i== 40{
-					fmt.Println("to see more tracks, use `edit`")
-					return
-				}
-				artists:= ""
-				for _, art:= range t.Track.Artists{
-					artists+= art.Name + ", "
-				}
-				fmt.Printf("%d- %s by %s\n", i, t.Track.Name, artists)
-			}
 		}
 	}
 }
