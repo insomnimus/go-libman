@@ -35,6 +35,7 @@ func init() {
 }
 
 func startSearchSession() {
+	COMMAND= "local"
 	signal.Notify(terminator, os.Interrupt)
 	dbptr, err:= bolt.Open(dbName, 0600, nil)
 	if err!= nil{

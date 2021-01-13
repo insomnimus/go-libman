@@ -61,7 +61,7 @@ var liveCmd = &cobra.Command{
 }
 
 func startLiveSession() {
-	defer IdentifyPanic()
+	COMMAND= "live"
 	defer liveCleanup()
 	signal.Notify(terminator, os.Interrupt)
 	

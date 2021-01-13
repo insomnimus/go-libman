@@ -9,6 +9,7 @@ import (
 	"github.com/zmb3/spotify"
 )
 
+var COMMAND= ""
 var(
 dbPath string= userdir.GetDataHome() + "/libman"
 dbName string= dbPath + "/libman.db"

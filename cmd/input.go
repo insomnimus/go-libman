@@ -14,14 +14,21 @@ terminator= make(chan os.Signal, 1)
 )
 
 func prompt() string {
-	ch := make(chan string, 1)
+	ch := make(chan string, 0)
 	go PromptChan(ch)
 	for {
 		select {
 		case input := <-ch:
 			return input
 		case <-terminator:
-			searchCleanup()
+			switch COMMAND{
+				case "player":
+				playerCleanup()
+				case "local":
+				searchCleanup()
+				case "live":
+				liveCleanup()
+			}
 			os.Exit(0)
 		}
 
@@ -37,7 +44,6 @@ func PromptNormal() string {
 }
 
 func PromptChan(ch chan<- string) {
-	
 	fmt.Print(">")
 	text, _ := reader.ReadString('\n')
 	text = strings.Replace(text, "\r\n", "", -1)

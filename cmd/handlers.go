@@ -22,6 +22,8 @@ func parsePlayerCommand(s string) {
 	}
 	
 	switch strings.ToLower(fields[0]){
+	case "shuffle":
+	toggleShuffle(fields[1:])
 	case "play":
 	play(fields[1:])
 	case "search", "s":
@@ -60,10 +62,10 @@ func playerHelp() {
 	you can play next/prev song with >/< or next/prev
 	
 	
-	
 	commands:
 	#play/search <name>
 	search for anything, then if you want to, play it
+	#shuffle on/off
 	
 	#volume <percentage>
 	set the volume

@@ -33,11 +33,12 @@ func init() {
 }
 
 func startPlayerSession() {
+	COMMAND= "player"
 	defer playerCleanup()
 	signal.Notify(terminator, os.Interrupt)
 	checkToken()
 	initPlayer()
-	fmt.Printf("welcome %s\n", user.DisplayName)
+	//fmt.Printf("welcome %s\n", user.DisplayName)
 	for{
 		parsePlayerCommand(prompt())
 	}
@@ -186,11 +187,11 @@ func changeVolume(arg string) {
 		fmt.Printf("invalid input %s\n", arg)
 		return
 	}
-	if playerVolume==0{
+	if playerVolume ==0 && amount <=0{
 		fmt.Println("muted")
 		return
 	}
-	if playerVolume== 100{
+	if playerVolume== 100 && amount >=0{
 		fmt.Println("max")
 		return
 	}
@@ -275,6 +276,9 @@ func playerCleanup() {
 		fmt.Println("fatal error: db is nil")
 		os.Exit(1)
 		}
+		// when hit ctrl-c it switches play state, so do it again
+		play(nil)
+		
 		// save the token
 		token, err:= client.Token()
 	if err!=nil{
@@ -308,7 +312,7 @@ func showCurrentlyPlaying() {
 		fmt.Fprintln(os.Stderr, err)
 		return
 	}
-	fmt.Printf("currently playing %s\n", tr)
+	fmt.Printf("currently playing %s\nshuffle=%t\n", tr, shuffleState)
 }
 
 type SearchResult struct{
@@ -353,18 +357,18 @@ func(sr SearchResult) String() string{
 	return fmt.Sprintf("result - %s", sr.Name)
 }
 
-func(srs SearchResults) Add(res ...SearchResult) {
-	srs= append(srs, res...)
+func(srs *SearchResults) Add(res ...SearchResult) {
+	*srs= append(*srs, res...)
 }
 
-func(srs SearchResults) chooseInteractive() {
-	if len(srs)==0{
+func(srs *SearchResults) chooseInteractive() {
+	if len(*srs)==0{
 		return
 	}
 	// to hold max 5 of each result type
 	var displays SearchResults
 	var art, alb, pla, tra SearchResults
-	for _, res:= range srs{
+	for _, res:= range *srs{
 		switch strings.ToLower(res.Type){
 			case "playlist":
 			pla.Add(res)
@@ -561,4 +565,36 @@ func playUserPlaylist(args []string) {
 		}
 	}
 	fmt.Printf("couldn't find any playlist of yours called %s\n", name)
+}
+
+func toggleShuffle(args []string) {
+	if len(args)==0{
+		err:= client.Shuffle(!shuffleState)
+		if err!=nil{
+			fmt.Fprintf(os.Stderr, "error: %s\n", err)
+			return
+		}
+		shuffleState= !shuffleState
+		fmt.Printf("shuffle=%t\n", shuffleState)
+		return
+	}
+	arg:= concat(args)
+	switch strings.ToLower(arg){
+		case "on", "true", "yes", "enable", "enabled", "1":
+		err:= client.Shuffle(true)
+		if err!=nil{
+			fmt.Fprintf(os.Stderr, "err: %s\n", err)
+			return
+		}
+		shuffleState= true
+		fmt.Printf("shuffle=%t\n", shuffleState)
+		case "no", "off", "disabled", "false", "0":
+		err:= client.Shuffle(false)
+		if err!=nil{
+			fmt.Fprintf(os.Stderr, "error: %s\n", err)
+			return
+		}
+		shuffleState=false
+		fmt.Printf("shuffle=%t\n", shuffleState)
+	}
 }
