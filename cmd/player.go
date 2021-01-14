@@ -34,7 +34,6 @@ func init() {
 
 func startPlayerSession() {
 	COMMAND= "player"
-	defer playerCleanup()
 	signal.Notify(terminator, os.Interrupt)
 	checkToken()
 	initPlayer()
@@ -142,28 +141,6 @@ func playNext() {
 	fmt.Println("playing the next track")
 }
 
-func pause() {
-	err:= client.Pause()
-	if err!=nil{
-		fmt.Fprintf(os.Stderr, "error: %s\n", err)
-		return
-	}
-	fmt.Println("paused")
-}
-
-func play(args []string) {
-	if len(args)==0{
-	err:= client.Play()
-	if err!=nil{
-		fmt.Fprintf(os.Stderr, "error: %s\n", err)
-		return
-	}
-	fmt.Println("playing")
-	return
-	}
-	playTrack(concat(args))
-}
-
 func currentlyPlayingTrack() (Track, error) {
 	var track Track
 	cp, err:= client.PlayerCurrentlyPlaying()
@@ -230,7 +207,7 @@ func toggle() {
 func playTrack(arg string) {
 	results, err:= searchAll(arg)
 	if err!=nil{
-		fmt.Fprintf(os.Stderr, "error: %s\n", err)
+		fmt.Printf("error: %s\n", err)
 		return
 	}
 	results.chooseInteractive()
@@ -277,8 +254,7 @@ func playerCleanup() {
 		os.Exit(1)
 		}
 		// when hit ctrl-c it switches play state, so do it again
-		play(nil)
-		
+		toggle()
 		// save the token
 		token, err:= client.Token()
 	if err!=nil{
@@ -382,7 +358,7 @@ func(srs *SearchResults) chooseInteractive() {
 		}
 	}
 	if len(tra) >=5{
-		displays.Add(art[:5]...)
+		displays.Add(tra[:5]...)
 	}else{
 		displays.Add(tra...)
 	}
@@ -427,6 +403,7 @@ func(srs *SearchResults) chooseInteractive() {
 }
 
 func searchAll(arg string)  (SearchResults, error){
+	defer IdentifyPanic()
 	if arg== ""{
 		return nil, fmt.Errorf("missing argument `query` for search")
 	}

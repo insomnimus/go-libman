@@ -24,16 +24,12 @@ func parsePlayerCommand(s string) {
 	switch strings.ToLower(fields[0]){
 	case "shuffle":
 	toggleShuffle(fields[1:])
-	case "play":
-	play(fields[1:])
 	case "search", "s":
 	if len(fields)==1{
 		fmt.Println("missing argument for search")
 		return
 	}
-	play(fields[1:])
-	case "pause":
-	pause()
+	playTrack(concat(fields[1:]))
 	case ">", "next", "n":
 	playNext()
 	case "<", "prev", "previous":
