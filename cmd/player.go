@@ -452,6 +452,7 @@ func searchAll(arg string)  (SearchResults, error){
 	}else{
 		query= arg
 	}
+	// TODO: change the client here
 	page, err:= client.Search(query, spotify.SearchTypePlaylist|spotify.SearchTypeTrack|spotify.SearchTypeArtist|spotify.SearchTypeAlbum)
 	if err!=nil{
 		return nil, err
