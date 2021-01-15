@@ -1,6 +1,7 @@
 package cmd
 
 import (
+"sort"
 "github.com/zmb3/spotify"
 "encoding/json"
 	"fmt"
@@ -307,6 +308,7 @@ type SearchResult struct{
 	URI *spotify.URI
 	URIs []spotify.URI
 	Type string
+	ID spotify.ID
 }
 
 type SearchResults []SearchResult
@@ -316,12 +318,22 @@ func(sr SearchResult) Play() {
 	if activeDevice!=nil{
 		opt= spotify.PlayOptions{DeviceID: &activeDevice.ID}
 	}
-	if sr.URI!= nil{
-		// means non-track
-		opt.PlaybackContext= sr.URI
-	}else{
-		// means track(s)
+	switch strings.ToLower(sr.Type){
+		case "track":
 		opt.URIs= sr.URIs
+		case "album":
+		opt.PlaybackContext= sr.URI
+		case "playlist":
+		uris, err:= sr.collectPlaylistURIs()
+		if err!=nil{
+			fmt.Println(err)
+			return
+		}
+		opt.URIs= uris
+		case "artist":
+		opt.PlaybackContext= sr.URI
+		default:
+		opt.PlaybackContext= sr.URI
 	}
 	err:= client.PlayOpt(&opt)
 	if err!=nil{
@@ -329,6 +341,25 @@ func(sr SearchResult) Play() {
 		return
 	}
 	fmt.Printf("playing %s\n", sr.Name)
+}
+
+func(sr SearchResult) collectPlaylistURIs() ([]spotify.URI, error){
+	page, err:= client.GetPlaylistTracks(sr.ID)
+	if err!=nil{
+		return nil, err
+	}
+	if len(page.Tracks) ==0 {
+		return nil, fmt.Errorf("no tracks could be fetched")
+	}
+	tracks:= page.Tracks
+	sort.Slice(tracks, func(i, j int) bool{
+		return tracks[i].Track.Popularity > tracks[j].Track.Popularity
+	})
+	var uris []spotify.URI
+	for _, track:= range tracks{
+		uris= append(uris, track.Track.URI)
+	}
+	return uris, nil
 }
 
 func(sr SearchResult) String() string{
@@ -456,6 +487,7 @@ func searchAll(arg string)  (SearchResults, error){
 				artists+= art.Name + ", "
 			}
 			results.Add(SearchResult{
+				ID: t.ID,
 				Name: t.Name,
 				Artists: artists,
 				Type: "track",
@@ -471,6 +503,7 @@ func searchAll(arg string)  (SearchResults, error){
 			results.Add(SearchResult{
 				Owner: owner.DisplayName,
 				Name: pl.Name,
+				ID: pl.ID,
 				URI: &pl.URI,
 				Type: "playlist",
 			})
@@ -480,6 +513,7 @@ func searchAll(arg string)  (SearchResults, error){
 		for _, art:= range page.Artists.Artists{
 			results.Add(SearchResult{
 				Name: art.Name,
+				ID: art.ID,
 				URI: &art.URI,
 				Type: "artist",
 			})
@@ -493,6 +527,7 @@ func searchAll(arg string)  (SearchResults, error){
 			}
 			results.Add(SearchResult{
 				Name: alb.Name,
+				ID: alb.ID,
 				Artists: artists,
 				URI: &alb.URI,
 				Type: "album",
