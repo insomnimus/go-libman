@@ -321,7 +321,7 @@ func(sr SearchResult) Play() {
 	switch strings.ToLower(sr.Type){
 		case "track":
 		opt.URIs= sr.URIs
-		case "album":
+		case "album", "userplaylist":
 		opt.PlaybackContext= sr.URI
 		case "playlist":
 		uris, err:= sr.collectPlaylistURIs()
@@ -574,7 +574,7 @@ func playUserPlaylist(args []string) {
 			continue
 		}
 		temp:= SearchResult{
-			Type: "playlist",
+			Type: "userplaylist",
 			URI: &pls[index].URI,
 			Name: pls[index].Name,
 		}
