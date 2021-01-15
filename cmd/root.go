@@ -30,7 +30,16 @@ var rootCmd = &cobra.Command{
 	Note:
 	libman needs to store the caches and the access token somewhere. by default, all the data is stored
 	under the users default data path (~/.local for linux and %APPDATA% for windows).
-	you can however, set the "LIBMAN_DB_PATH" environment variable to target somewhere else (windows users should use forward slashes as well)`,
+	you can however, set the "LIBMAN_DB_PATH" environment variable to target somewhere else (windows users should use forward slashes as well)
+	
+	libman expects these env variables to be set:
+	$SPOTIFY_ID
+	$SPOTIFY_SECRET
+	
+	you will have to register an application at: https://developer.spotify.com/my-applications/
+	- Use "http://localhost:8080/callback" as the redirect URI
+	
+	`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	//	Run: func(cmd *cobra.Command, args []string) { },
