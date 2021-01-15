@@ -136,6 +136,7 @@ func playPrev() {
 		fmt.Fprintf(os.Stderr, "error: %s\n", err)
 		return
 	}
+	isPlaying= true
 	fmt.Println("playing previous track")
 }
 
@@ -145,6 +146,7 @@ func playNext() {
 		fmt.Fprintf(os.Stderr, "error: %s\n", err)
 		return
 	}
+	isPlaying= true
 	fmt.Println("playing the next track")
 }
 
