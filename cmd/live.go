@@ -248,9 +248,10 @@ func choosePlaylist(args []string) {
 
 func editSelectedPlaylist() {
 	if selectedSimple== nil{
-		fmt.Println("you need to select a playlist first, use `select`")
+		fmt.Println("you need to choose a playlist with `select`")
 		return
 	}
+	fmt.Println("enter blank or -1 to go back")
 	page, err:= client.GetPlaylistTracks(selectedSimple.ID)
 	if err!=nil{
 		fmt.Fprintf(os.Stderr, "error fetching the list of tracks in %s:\n%s\n", selectedSimple.Name, err)
@@ -298,6 +299,7 @@ func editSelectedPlaylist() {
 				fmt.Println("changes aborted, returning to main page")
 				return
 			}
+			fmt.Println("returning")
 		}
 		fields= strings.Fields(input)
 		if len(fields)== 0{
@@ -665,7 +667,7 @@ func createPlaylist() {
 		fmt.Fprintf(os.Stderr, "error creating new playlist: %s\n", err)
 		return
 	}
-	fmt.Printf("created playlist %s, select it with `select`\n", name)
+	fmt.Printf("created playlist %s\n", name)
 }
 
 func loadCache(args []string) {

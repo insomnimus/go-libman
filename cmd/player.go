@@ -14,6 +14,7 @@ import (
 )
 
 var(
+activeDevice *spotify.PlayerDevice
 playerVolume= 80
 isPlaying bool
 shuffleState bool
@@ -44,6 +45,11 @@ func startPlayerSession() {
 }
 
 func initPlayer(){
+	activeDevice= getActiveDevice()
+	if activeDevice!=nil{
+		playerVolume= activeDevice.Volume
+		fmt.Printf("device: %s\n", activeDevice.Name)
+	}
 	plState, err:= client.PlayerState()
 	if err!=nil{
 		fmt.Fprintf(os.Stderr, "error fetching player state: %s\n", err)
@@ -66,6 +72,7 @@ func initPlayer(){
 		return
 	}
 	fmt.Printf("shuffle=%t\n", shuffleState)
+	
 }
 
 func saveCurrentlyPlaying(args []string) {
@@ -102,7 +109,7 @@ func saveCurrentlyPlaying(args []string) {
 			}
 			playlists[index].addCache= append(playlists[index].addCache, playingTrack)
 			playlists[index].Commit()
-			fmt.Printf("done")
+			fmt.Println("done")
 			return
 		}
 	}
@@ -187,19 +194,21 @@ func changeVolume(arg string) {
 }
 
 func toggle() {
+	var opt spotify.PlayOptions
+	if activeDevice!= nil{
+		opt= spotify.PlayOptions{DeviceID: &activeDevice.ID}
+	}
 	if isPlaying{
-		err:= client.Pause()
+		err:= client.PauseOpt(&opt)
 		if err!=nil{
 			fmt.Fprintf(os.Stderr, "error: %s\n", err)
-			return
 		}
 		isPlaying= false
 		return
 	}
-	err:= client.Play()
+	err:= client.PlayOpt(&opt)
 	if err!=nil{
 		fmt.Fprintf(os.Stderr, "error: %s\n", err)
-		return
 	}
 	isPlaying= true
 }
@@ -292,7 +301,7 @@ func showCurrentlyPlaying() {
 }
 
 type SearchResult struct{
-	Name, Artists string
+	Name, Artists, Owner string
 	URI *spotify.URI
 	URIs []spotify.URI
 	Type string
@@ -302,6 +311,9 @@ type SearchResults []SearchResult
 
 func(sr SearchResult) Play() {
 	var opt spotify.PlayOptions
+	if activeDevice!=nil{
+		opt= spotify.PlayOptions{DeviceID: &activeDevice.ID}
+	}
 	if sr.URI!= nil{
 		// means non-track
 		opt.PlaybackContext= sr.URI
@@ -322,7 +334,7 @@ func(sr SearchResult) String() string{
 		case "track", "song":
 		return fmt.Sprintf("track - %s by %s", sr.Name, sr.Artists)
 		case "playlist":
-		return fmt.Sprintf("playlist - %s", sr.Name)
+		return fmt.Sprintf("playlist - %s | %s", sr.Name, sr.Owner)
 		case "artist":
 		return fmt.Sprintf("artist - %s", sr.Name)
 		case "album":
@@ -403,7 +415,7 @@ func(srs *SearchResults) chooseInteractive() {
 }
 
 func searchAll(arg string)  (SearchResults, error){
-	defer IdentifyPanic()
+	//defer IdentifyPanic()
 	if arg== ""{
 		return nil, fmt.Errorf("missing argument `query` for search")
 	}
@@ -450,8 +462,12 @@ func searchAll(arg string)  (SearchResults, error){
 		}
 	}
 	if page.Playlists != nil && len(page.Playlists.Playlists)>0{
-		for _, pl:= range page.Playlists.Playlists{
+		for i, pl:= range page.Playlists.Playlists{
+			if i==5{break}
+			owner, err:= client.GetUsersPublicProfile(spotify.ID(pl.Owner.ID))
+			if err!=nil{ continue}
 			results.Add(SearchResult{
+				Owner: owner.DisplayName,
 				Name: pl.Name,
 				URI: &pl.URI,
 				Type: "playlist",
@@ -576,3 +592,68 @@ func toggleShuffle(args []string) {
 		fmt.Printf("shuffle=%t\n", shuffleState)
 	}
 }
+
+func chooseDevice() {
+	devices, err:= client.PlayerDevices()
+	if err!=nil{
+		fmt.Println(err)
+		return
+	}
+	if len(devices)==0{
+		fmt.Println("no device detected")
+		return
+	}
+	for i, device:= range devices{
+		fmt.Printf("%d- %s (active=%t)\n", i, device.Name, device.Active)
+	}
+	fmt.Println("choose a device, enter blank or -1 to return")
+	var input string
+	for{
+		input= prompt()
+		if input== "" || input== "-1"{
+			fmt.Println("cancelled")
+			return
+		}
+		index, err:= strconv.Atoi(input)
+		if err!=nil{
+			fmt.Println("invalid input, enter again:")
+			continue
+		}
+		if index<0 || index>= len(devices){
+			fmt.Printf("invalid input, enter 0-%d\n", len(devices)-1)
+			continue
+		}
+		setDevice(devices[index])
+		return
+	}
+}
+
+func setDevice(device spotify.PlayerDevice) {
+	if activeDevice!= nil && device.ID== activeDevice.ID{
+		fmt.Println("device already active")
+		return
+	}
+	
+	err:= client.TransferPlayback(device.ID, isPlaying)
+	if err!=nil{
+		fmt.Println(err)
+		return
+	}
+	activeDevice= &device
+	fmt.Printf("playing on %s\n", device.Name)
+}
+
+func getActiveDevice() *spotify.PlayerDevice{
+	devices, err:= client.PlayerDevices()
+	if err!=nil{
+		fmt.Printf("error fetching the list of devices: %s\n", err)
+		return nil
+	}
+	for _, device:= range devices{
+		if device.Active{
+			return &device
+		}
+	}
+	return nil
+}
+

@@ -9,11 +9,17 @@ import (
 
 // GetDataHome returns the user data directory.
 func GetDataHome() string {
+	if userSet != ""{
+		return userSet
+	}
 	return getRoamingAppDataDir()
 }
 
 // GetConfigHome returns the user config directory.
 func GetConfigHome() string {
+	if userSet != ""{
+		return userSet
+	}
 	return getRoamingAppDataDir()
 }
 

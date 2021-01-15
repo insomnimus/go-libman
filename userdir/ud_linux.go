@@ -1,6 +1,9 @@
 // +build linux
 package userdir
 
-func GetDataHome()string{
-	return "/mnt/C/Users/insomnia/AppData/Roaming/libman"
+func GetDataHome() string{
+	if userSet != ""{
+		return userSet
+	}
+	return os.Getenv("HOME") + "/.local"
 }

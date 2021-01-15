@@ -6,14 +6,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const VERSION= "devel 0.8"
+const VERSION= "0.9.1"
 
 var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "display libman version",
 	Long: `display the libman version`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("libman %s\n", VERSION)
+		fmt.Printf("libman version %s\n", VERSION)
 	},
 }
 

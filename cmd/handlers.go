@@ -24,6 +24,10 @@ func parsePlayerCommand(s string) {
 	switch strings.ToLower(fields[0]){
 	case "shuffle":
 	toggleShuffle(fields[1:])
+	case "choose", "select":
+	choosePlaylist(fields[1:])
+	case "edit":
+	editSelectedPlaylist()
 	case "search", "s":
 	if len(fields)==1{
 		fmt.Println("missing argument for search")
@@ -40,12 +44,16 @@ func parsePlayerCommand(s string) {
 	playerHelp()
 	case "mute":
 	changeVolume("-100")
-	case "what", "?":
+	case "what", "?", "current":
 	showCurrentlyPlaying()
 	case "playlists", "pl":
 	playUserPlaylist(fields[1:])
 	case "volume", "vol":
 	volume(fields[1:])
+	case "device":
+	chooseDevice()
+	case "create", "new":
+	createPlaylist()
 	default:
 	fmt.Printf("unknown command %q\n", fields[0])
 	}
@@ -59,14 +67,15 @@ func playerHelp() {
 	
 	
 	commands:
-	#play/search <name>
+	#s/search <name>
 	search for anything, then if you want to, play it
-	#shuffle on/off
+	#shuffle
+	toggle shuffle
 	
 	#volume <percentage>
 	set the volume
 	
-	#what
+	#what/current
 	show currently playing
 	
 	#save/add [playlist name]
@@ -74,6 +83,19 @@ func playerHelp() {
 	
 	#playlists/pl [playlist name]
 	play one of your playlists
+	
+	#create/new
+	create a new playlist
+	
+	#device
+	choose a playback device
+	
+	#select/choose
+	choose a playlist (this command is for editing, does not affect playback)
+	
+	#edit
+	edit the selected playlist
+	
 	#mute
 	mute
 	`

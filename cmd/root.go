@@ -16,23 +16,26 @@ dbName string= dbPath + "/libman.db"
 db *bolt.DB
 )
 
-// rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "libman",
 	Short: "a spotify library manager",
 	Long: `usage:
-	libman <subcommand> [flags]
+	libman <subcommand>
 	
 	subcommands are:
-	#search
-	#live`,
+	#player | to control playback and do simple library management
+	#live | no playback, more control over library management
+	#local | doesn't require authentication, modify local caches for later syncing
+	
+	Note:
+	libman needs to store the caches and the access token somewhere. by default, all the data is stored
+	under the users default data path (~/.local for linux and %APPDATA% for windows).
+	you can however, set the "LIBMAN_DB_PATH" environment variable to target somewhere else (windows users should use forward slashes as well)`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	//	Run: func(cmd *cobra.Command, args []string) { },
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -42,7 +45,7 @@ func Execute() {
 
 func init() {
 	if _, err:= os.Stat(dbPath); os.IsNotExist(err){
-		if fileErr := os.Mkdir(dbPath, 0764); fileErr!=nil{
+		if fileErr := os.MkdirAll(dbPath, 0764); fileErr!=nil{
 			fmt.Fprintf(os.Stderr, "failed to create a directory for database in %s\n", fileErr)
 			os.Exit(1)
 		}
