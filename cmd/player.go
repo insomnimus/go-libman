@@ -587,8 +587,9 @@ func playUserPlaylist(args []string) {
 	for _, p:= range pls{
 		if strings.EqualFold(p.Name, name){
 			temp:= SearchResult{
-				Type: "playlist",
+				Type: "userplaylist",
 				Name: p.Name,
+				ID: p.ID,
 				URI: &p.URI,
 			}
 			temp.Play()
@@ -693,4 +694,3 @@ func getActiveDevice() *spotify.PlayerDevice{
 	}
 	return nil
 }
-
