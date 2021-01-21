@@ -269,7 +269,10 @@ func playerCleanup() {
 		os.Exit(1)
 	}
 	// when hit ctrl-c it switches play state, so do it again
+	// only windows has this issue
+	if os.PathSeparator == '\\'{
 	toggle()
+	}
 	// save the token
 	token, err := client.Token()
 	if err != nil {
