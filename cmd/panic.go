@@ -1,16 +1,16 @@
 package cmd
 
-import(
-"fmt"
-"runtime"
-"strings"
+import (
+	"fmt"
+	"runtime"
+	"strings"
 )
 
 func identifyPanic() string {
 	var name, file string
 	var line int
 	var pc [16]uintptr
-	
+
 	n := runtime.Callers(3, pc[:])
 	for _, pc := range pc[:n] {
 		fn := runtime.FuncForPC(pc)
@@ -23,14 +23,14 @@ func identifyPanic() string {
 			break
 		}
 	}
-	
+
 	switch {
 	case name != "":
 		return fmt.Sprintf("%v:%v", name, line)
 	case file != "":
 		return fmt.Sprintf("%v:%v", file, line)
 	}
-	
+
 	return fmt.Sprintf("pc:%x", pc)
 }
 

@@ -1,16 +1,16 @@
 package cmd
 
-import(
-"time"
-"bufio"
-"os"
-"strings"
-"fmt"
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strings"
+	"time"
 )
 
-var(
-reader = bufio.NewReader(os.Stdin)
-terminator= make(chan os.Signal, 1)
+var (
+	reader     = bufio.NewReader(os.Stdin)
+	terminator = make(chan os.Signal, 1)
 )
 
 func prompt() string {
@@ -21,12 +21,12 @@ func prompt() string {
 		case input := <-ch:
 			return input
 		case <-terminator:
-			switch COMMAND{
-				case "player":
+			switch COMMAND {
+			case "player":
 				playerCleanup()
-				case "local":
+			case "local":
 				searchCleanup()
-				case "live":
+			case "live":
 				liveCleanup()
 			}
 			os.Exit(0)
@@ -39,7 +39,7 @@ func PromptNormal() string {
 	fmt.Print(">")
 	text, _ := reader.ReadString('\n')
 	text = strings.Replace(text, "\r\n", "", -1)
-	text= strings.Replace(text, "\n", "", -1)
+	text = strings.Replace(text, "\n", "", -1)
 	return text
 }
 
@@ -54,16 +54,16 @@ func minutes(d int) string {
 	return fmt.Sprintf("%s", time.Duration(d)*time.Millisecond)
 }
 
-func yesOrNo() bool{
-	input:= ""
-	for{
-		input=prompt()
-		switch strings.ToLower(input){
-			case "yeah", "yes", "y", "yep", "okay", "ok":
+func yesOrNo() bool {
+	input := ""
+	for {
+		input = prompt()
+		switch strings.ToLower(input) {
+		case "yeah", "yes", "y", "yep", "okay", "ok":
 			return true
-			case "no", "nope", "n", "nah":
+		case "no", "nope", "n", "nah":
 			return false
-			default:
+		default:
 			fmt.Println("please enter yes or no (y/n)")
 		}
 	}
@@ -71,53 +71,53 @@ func yesOrNo() bool{
 }
 
 func parseSearchCommand(input string) {
-	fields:= strings.Fields(input)
-	if len(fields) == 0{
+	fields := strings.Fields(input)
+	if len(fields) == 0 {
 		return
 	}
 	// separate if input is `$abc` (so it'll be `$ abc`)
-	if input[0]== '$' && len(input) > 1 && input[1] != ' '{
-		temp:= fields[0][1:]
-		fields= append([]string{"$", temp}, fields[1:]...)
+	if input[0] == '$' && len(input) > 1 && input[1] != ' ' {
+		temp := fields[0][1:]
+		fields = append([]string{"$", temp}, fields[1:]...)
 	}
-	switch strings.ToLower(fields[0]){
-		case "s", "search", "$":
-		if len(fields)== 1{
+	switch strings.ToLower(fields[0]) {
+	case "s", "search", "$":
+		if len(fields) == 1 {
 			fmt.Println("missing argument for search: query\nreturning")
 			return
 		}
 		searchTrack(concat(fields[1:]))
 		return
-		case "choose", "cache", "c", "change", "cac", "select":
+	case "choose", "cache", "c", "change", "cac", "select":
 		chooseCache(fields[1:])
-		case "new", "create", "n":
+	case "new", "create", "n":
 		createCache(fields[1:])
-		case "help", "h":
+	case "help", "h":
 		searchHelp(fields[1:])
-		case "d", "del", "remove", "delete":
+	case "d", "del", "remove", "delete":
 		deleteCache(fields[1:])
-		case "e", "edit":
+	case "e", "edit":
 		editCache(fields[1:])
-		case "list", "l":
+	case "list", "l":
 		showCache(fields[1:])
-		default:
+	default:
 		fmt.Printf("unknown command %q\n", fields[0])
 	}
 }
 
-func concat(args []string) string{
-	if len(args)==0{
+func concat(args []string) string {
+	if len(args) == 0 {
 		return ""
 	}
-	x:= ""
-	for _, s:= range args{
-		x+= " " + s
+	x := ""
+	for _, s := range args {
+		x += " " + s
 	}
 	return x[1:]
 }
 
 func searchHelp(_ []string) {
-		fmt.Println(`commands:
+	fmt.Println(`commands:
 		#new [name]: create a new cache
 		(n, create)
 		name can be omitted for an interactive screen
@@ -165,7 +165,7 @@ func searchHelp(_ []string) {
 }
 
 func beginSearchLoop() {
-	for{
+	for {
 		parseSearchCommand(prompt())
 	}
 }

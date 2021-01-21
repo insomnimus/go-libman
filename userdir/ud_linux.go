@@ -1,8 +1,8 @@
 // +build linux
 package userdir
 
-func GetDataHome() string{
-	if userSet != ""{
+func GetDataHome() string {
+	if userSet != "" {
 		return userSet
 	}
 	return os.Getenv("HOME") + "/.local"
