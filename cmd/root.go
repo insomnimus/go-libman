@@ -5,7 +5,7 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/spf13/cobra"
 	"github.com/zmb3/spotify"
-	"libman/userdir"
+	"github.com/insomnimus/libman/userdir"
 	"os"
 	"strings"
 )

@@ -1,10 +1,10 @@
-module libman
+module github.com/insomnimus/libman
 
-go 1.14
+go 1.16
 
 require (
 	github.com/boltdb/bolt v1.3.1
 	github.com/spf13/cobra v1.1.1
 	github.com/zmb3/spotify v0.0.0-20201231194903-e2d01d9b8bd2
-	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
+	golang.org/x/oauth2 v0.0.0-20210113205817-d3ed898aa8a3
 )

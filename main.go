@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import "libman/cmd"
+import "github.com/insomnimus/libman/cmd"
 
 func main() {
 	cmd.Execute()
