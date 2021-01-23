@@ -21,18 +21,38 @@ func parsePlayerCommand(s string) {
 	}
 
 	switch strings.ToLower(fields[0]) {
-	case "shuffle":
+	case "shuffle", "shuf":
 		toggleShuffle(fields[1:])
 	case "choose", "select":
 		choosePlaylist(fields[1:])
 	case "edit":
 		editSelectedPlaylist()
-	case "search", "s":
+	case "stra", "strack", "searchtrack":
+	if len(fields)== 1{
+		fmt.Println("missing argument for search")
+	}
+	playStra(concat(fields[1:]))
+	case "sart", "sartist", "searchartist":
+	if len(fields)== 1{
+		fmt.Println("missing argument for search")
+	}
+	playSart(concat(fields[1:]))
+	case "salb", "salbum", "searchalbum":
+	if len(fields)== 1{
+		fmt.Println("missing argument for search")
+	}
+	playSalb(concat(fields[1:]))
+	case "spla", "spl", "splaylist", "searchplaylist":
+	if len(fields)== 1{
+		fmt.Println("missing argument for search")
+	}
+	playSpla(concat(fields[1:]))
+	case "search", "s", "sall", "sal":
 		if len(fields) == 1 {
 			fmt.Println("missing argument for search")
 			return
 		}
-		playTrack(concat(fields[1:]))
+		playSall(concat(fields[1:]))
 	case ">", "next", "n":
 		playNext()
 	case "<", "prev", "previous":
@@ -111,6 +131,10 @@ func playerHelp() {
 	
 	#recommend|rec <playlist name>
 	get recommendations based on a user playlist
+	
+	
+	#salb, sart, stra, spla:
+	search for albums, artists, tracks or playlists respectively
 	
 	#show|sh [playlist|recommendation]
 	show a playlists or recommendations contents

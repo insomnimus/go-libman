@@ -222,15 +222,6 @@ func toggle() {
 	isPlaying = true
 }
 
-func playTrack(arg string) {
-	results, err := searchAll(arg)
-	if err != nil {
-		fmt.Printf("error: %s\n", err)
-		return
-	}
-	results.chooseInteractive()
-}
-
 func volume(args []string) {
 	if len(args) == 0 {
 		fmt.Printf("the volume is %d%%\n", playerVolume)
@@ -465,15 +456,6 @@ func searchAll(arg string) (SearchResults, error) {
 	var query string
 	if strings.Contains(arg, "::") {
 		split := strings.Split(arg, "::")
-		if len(split) == 2 {
-			query = fmt.Sprintf("track:%s artist:%s",
-				strings.TrimSpace(split[0]),
-				strings.TrimSpace(split[1]))
-		} else {
-			query = arg
-		}
-	} else if strings.Contains(arg, "-") {
-		split := strings.Split(arg, "-")
 		if len(split) == 2 {
 			query = fmt.Sprintf("track:%s artist:%s",
 				strings.TrimSpace(split[0]),
