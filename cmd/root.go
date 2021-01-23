@@ -104,10 +104,11 @@ type Playlist struct {
 }
 
 type Track struct {
-	Name    string   `json:"name"`
-	ID      string   `json:"id"`
-	Artists []string `json:"artists"`
-	URI     spotify.URI
+	Name     string   `json:"name"`
+	ID       string   `json:"id"`
+	Artists  []string `json:"artists"`
+	URI      spotify.URI
+	Duration string
 }
 
 func (t Track) String() string {
@@ -118,8 +119,12 @@ func (t Track) String() string {
 	if artists != "" {
 		artists = artists[1:]
 	}
-	return fmt.Sprintf("%s by %s", t.Name, artists)
 
+	msg := fmt.Sprintf("%s by %s", t.Name, artists)
+	if t.Duration != "" {
+		msg += " | " + t.Duration
+	}
+	return msg
 }
 
 type Cache struct {

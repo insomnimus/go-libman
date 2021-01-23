@@ -167,6 +167,7 @@ func currentlyPlayingTrack() (Track, error) {
 		return track, fmt.Errorf("not playing anything")
 	}
 	track.ID = string(cp.Item.ID)
+	track.Duration = minutes(cp.Item.Duration)
 	for _, art := range cp.Item.Artists {
 		track.Artists = append(track.Artists, art.Name)
 	}

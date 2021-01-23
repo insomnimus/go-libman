@@ -50,14 +50,15 @@ func (srs *SearchResults) ChooseInteractiveBare() {
 }
 
 func search(arg string, sType spotify.SearchType) (SearchResults, error) {
+	defer IdentifyPanic()
 	if arg == "" {
 		return nil, fmt.Errorf("search term can't be empty")
 	}
-	var query string
+	query := ""
 	if strings.Contains(arg, "::") {
 		split := strings.Split(arg, "::")
 		if len(split) == 2 {
-			query = fmt.Sprintf("track:%s artist:%s",
+			query = fmt.Sprintf("%s artist:%s",
 				strings.TrimSpace(split[0]),
 				strings.TrimSpace(split[1]))
 		} else {
@@ -114,7 +115,7 @@ func search(arg string, sType spotify.SearchType) (SearchResults, error) {
 			})
 		}
 	}
-	if page.Albums.Albums != nil && len(page.Albums.Albums) > 0 {
+	if page.Albums != nil && page.Albums.Albums != nil {
 		for _, alb := range page.Albums.Albums {
 			artists := ""
 			for _, art := range alb.Artists {
@@ -136,6 +137,10 @@ func search(arg string, sType spotify.SearchType) (SearchResults, error) {
 }
 
 func playSall(arg string) {
+	if arg == "" {
+		fmt.Println("missing argument for search")
+		return
+	}
 	results, err := search(arg, spotify.SearchTypeArtist|spotify.SearchTypeAlbum|spotify.SearchTypeTrack|spotify.SearchTypePlaylist)
 	if err != nil {
 		fmt.Printf("error: %s\n", err)
