@@ -646,7 +646,7 @@ func parseLiveCommand(s string) {
 	case "h", "help":
 		helpLive(fields[1:])
 	case "show", "display":
-		show(fields[1:])
+		showLive(fields[1:])
 	case "caches":
 		listCaches()
 	default:
@@ -803,7 +803,7 @@ func helpLive(_ []string) {
 	fmt.Println(msg)
 }
 
-func show(args []string) {
+func showLive(args []string) {
 	if len(args) != 0 {
 		switch strings.ToLower(args[0]) {
 		case "cache", "c", "cac":

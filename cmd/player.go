@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"github.com/boltdb/bolt"
 	"github.com/zmb3/spotify"
+	"math/rand"
 	"os"
 	"os/signal"
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 	//"github.com/zmb3/spotify"
 	"github.com/spf13/cobra"
 )
@@ -37,6 +39,7 @@ func init() {
 
 func startPlayerSession() {
 	COMMAND = "player"
+	rand.Seed(time.Now().UnixNano())
 	signal.Notify(terminator, os.Interrupt)
 	checkToken()
 	initPlayer()
@@ -270,8 +273,8 @@ func playerCleanup() {
 	}
 	// when hit ctrl-c it switches play state, so do it again
 	// only windows has this issue
-	if os.PathSeparator == '\\'{
-	toggle()
+	if os.PathSeparator == '\\' {
+		toggle()
 	}
 	// save the token
 	token, err := client.Token()
@@ -306,7 +309,7 @@ func showCurrentlyPlaying() {
 		fmt.Fprintln(os.Stderr, err)
 		return
 	}
-	fmt.Printf("currently playing %s\nshuffle=%t\n", tr, shuffleState)
+	fmt.Printf("currently playing %s\nshuffle=%t repeat=%s\n", tr, shuffleState, repeatState)
 }
 
 type SearchResult struct {
@@ -456,7 +459,6 @@ func (srs *SearchResults) chooseInteractive() {
 }
 
 func searchAll(arg string) (SearchResults, error) {
-	//defer IdentifyPanic()
 	if arg == "" {
 		return nil, fmt.Errorf("missing argument `query` for search")
 	}
@@ -482,7 +484,6 @@ func searchAll(arg string) (SearchResults, error) {
 	} else {
 		query = arg
 	}
-	// TODO: change the client here
 	page, err := client.Search(query, spotify.SearchTypePlaylist|spotify.SearchTypeTrack|spotify.SearchTypeArtist|spotify.SearchTypeAlbum)
 	if err != nil {
 		return nil, err

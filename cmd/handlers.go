@@ -57,6 +57,10 @@ func parsePlayerCommand(s string) {
 		renamePlaylist(fields[1:])
 	case "repeat", "rep":
 		cycleRepeatState(fields[1:])
+	case "recommend", "rec", "recom":
+		recommend(fields[1:])
+	case "show", "sh":
+		show(fields[1:])
 	default:
 		fmt.Printf("unknown command %q\n", fields[0])
 	}
@@ -104,6 +108,14 @@ func playerHelp() {
 	
 	#rename old >> new
 	rename a playlist
+	
+	#recommend|rec <playlist name>
+	get recommendations based on a user playlist
+	
+	#show|sh [playlist|recommendation]
+	show a playlists or recommendations contents
+	arguments can be shortened like "pl, rec"
+	
 	#mute
 	mute
 	`

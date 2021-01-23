@@ -3,9 +3,9 @@ package cmd
 import (
 	"fmt"
 	"github.com/boltdb/bolt"
+	"github.com/insomnimus/libman/userdir"
 	"github.com/spf13/cobra"
 	"github.com/zmb3/spotify"
-	"github.com/insomnimus/libman/userdir"
 	"os"
 	"strings"
 )
@@ -107,6 +107,7 @@ type Track struct {
 	Name    string   `json:"name"`
 	ID      string   `json:"id"`
 	Artists []string `json:"artists"`
+	URI     spotify.URI
 }
 
 func (t Track) String() string {

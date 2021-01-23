@@ -156,3 +156,16 @@ func getSimplePlaylists() ([]spotify.SimplePlaylist, error) {
 	}
 	return page.Playlists, nil
 }
+
+func getPlaylist(name string) (*Playlist, error) {
+	pls, err := getPlaylists()
+	if err != nil {
+		return nil, err
+	}
+	for _, pl := range pls {
+		if strings.EqualFold(pl.Name, name) {
+			return pl, nil
+		}
+	}
+	return nil, fmt.Errorf("no playlist by the name %s found", name)
+}
