@@ -28,25 +28,25 @@ func parsePlayerCommand(s string) {
 	case "edit":
 		editSelectedPlaylist()
 	case "stra", "strack", "searchtrack":
-	if len(fields)== 1{
-		fmt.Println("missing argument for search")
-	}
-	playStra(concat(fields[1:]))
+		if len(fields) == 1 {
+			fmt.Println("missing argument for search")
+		}
+		playStra(concat(fields[1:]))
 	case "sart", "sartist", "searchartist":
-	if len(fields)== 1{
-		fmt.Println("missing argument for search")
-	}
-	playSart(concat(fields[1:]))
+		if len(fields) == 1 {
+			fmt.Println("missing argument for search")
+		}
+		playSart(concat(fields[1:]))
 	case "salb", "salbum", "searchalbum":
-	if len(fields)== 1{
-		fmt.Println("missing argument for search")
-	}
-	playSalb(concat(fields[1:]))
+		if len(fields) == 1 {
+			fmt.Println("missing argument for search")
+		}
+		playSalb(concat(fields[1:]))
 	case "spla", "spl", "splaylist", "searchplaylist":
-	if len(fields)== 1{
-		fmt.Println("missing argument for search")
-	}
-	playSpla(concat(fields[1:]))
+		if len(fields) == 1 {
+			fmt.Println("missing argument for search")
+		}
+		playSpla(concat(fields[1:]))
 	case "search", "s", "sall", "sal":
 		if len(fields) == 1 {
 			fmt.Println("missing argument for search")

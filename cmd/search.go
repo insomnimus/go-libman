@@ -1,21 +1,21 @@
 package cmd
 
-import(
-"strconv"
-"github.com/zmb3/spotify"
-"fmt"
-"strings"
+import (
+	"fmt"
+	"github.com/zmb3/spotify"
+	"strconv"
+	"strings"
 )
 
-func(sr SearchResult) StringBare() string{
-	msg:= ""
+func (sr SearchResult) StringBare() string {
+	msg := ""
 	switch strings.ToLower(sr.Type) {
-		case "track", "song", "album":
-		msg= fmt.Sprintf("%s by %s", sr.Name, sr.Artists)
-		case "playlist":
-		msg= fmt.Sprintf("%s | %s", sr.Name, sr.Owner)
-		default:
-		msg= sr.Name
+	case "track", "song", "album":
+		msg = fmt.Sprintf("%s by %s", sr.Name, sr.Artists)
+	case "playlist":
+		msg = fmt.Sprintf("%s | %s", sr.Name, sr.Owner)
+	default:
+		msg = sr.Name
 	}
 	return msg
 }
@@ -24,7 +24,7 @@ func (srs *SearchResults) ChooseInteractiveBare() {
 	if len(*srs) == 0 {
 		return
 	}
-	for i, res := range *srs{
+	for i, res := range *srs {
 		fmt.Printf("%d- %s\n", i, res.StringBare())
 	}
 	var input string
@@ -50,7 +50,7 @@ func (srs *SearchResults) ChooseInteractiveBare() {
 }
 
 func search(arg string, sType spotify.SearchType) (SearchResults, error) {
-	if arg== ""{
+	if arg == "" {
 		return nil, fmt.Errorf("search term can't be empty")
 	}
 	var query string
@@ -66,8 +66,8 @@ func search(arg string, sType spotify.SearchType) (SearchResults, error) {
 	} else {
 		query = arg
 	}
-	page, err:= client.Search(query, sType)
-	if err!=nil{
+	page, err := client.Search(query, sType)
+	if err != nil {
 		return nil, err
 	}
 	var results SearchResults
@@ -145,8 +145,8 @@ func playSall(arg string) {
 }
 
 func playStra(arg string) {
-	results, err:= search(arg, spotify.SearchTypeTrack)
-	if err!=nil{
+	results, err := search(arg, spotify.SearchTypeTrack)
+	if err != nil {
 		fmt.Printf("error: %s\n", err)
 		return
 	}
@@ -154,8 +154,8 @@ func playStra(arg string) {
 }
 
 func playSalb(arg string) {
-	results, err:= search(arg, spotify.SearchTypeAlbum)
-	if err!=nil{
+	results, err := search(arg, spotify.SearchTypeAlbum)
+	if err != nil {
 		fmt.Printf("error: %s\n", err)
 		return
 	}
@@ -163,8 +163,8 @@ func playSalb(arg string) {
 }
 
 func playSpla(arg string) {
-	results, err:= search(arg, spotify.SearchTypePlaylist)
-	if err!=nil{
+	results, err := search(arg, spotify.SearchTypePlaylist)
+	if err != nil {
 		fmt.Printf("error: %s\n", err)
 		return
 	}
@@ -172,8 +172,8 @@ func playSpla(arg string) {
 }
 
 func playSart(arg string) {
-	results, err:= search(arg, spotify.SearchTypeArtist)
-	if err!=nil{
+	results, err := search(arg, spotify.SearchTypeArtist)
+	if err != nil {
 		fmt.Printf("error: %s\n", err)
 		return
 	}
