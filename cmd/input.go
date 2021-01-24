@@ -36,7 +36,7 @@ func prompt() string {
 }
 
 func PromptNormal() string {
-	fmt.Print(">")
+	fmt.Print("> ")
 	text, _ := reader.ReadString('\n')
 	text = strings.Replace(text, "\r\n", "", -1)
 	text = strings.Replace(text, "\n", "", -1)
