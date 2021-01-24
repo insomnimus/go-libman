@@ -50,7 +50,6 @@ func (srs *SearchResults) ChooseInteractiveBare() {
 }
 
 func search(arg string, sType spotify.SearchType) (SearchResults, error) {
-	defer IdentifyPanic()
 	if arg == "" {
 		return nil, fmt.Errorf("search term can't be empty")
 	}
@@ -100,7 +99,7 @@ func search(arg string, sType spotify.SearchType) (SearchResults, error) {
 				Owner: owner.DisplayName,
 				Name:  pl.Name,
 				ID:    pl.ID,
-				URI:   &pl.URI,
+				URI:   &(pl.URI),
 				Type:  "playlist",
 			})
 		}
@@ -110,7 +109,7 @@ func search(arg string, sType spotify.SearchType) (SearchResults, error) {
 			results.Add(SearchResult{
 				Name: art.Name,
 				ID:   art.ID,
-				URI:  &art.URI,
+				URI:  &(art.URI),
 				Type: "artist",
 			})
 		}
@@ -125,7 +124,7 @@ func search(arg string, sType spotify.SearchType) (SearchResults, error) {
 				Name:    alb.Name,
 				ID:      alb.ID,
 				Artists: artists,
-				URI:     &alb.URI,
+				URI:     &(alb.URI),
 				Type:    "album",
 			})
 		}

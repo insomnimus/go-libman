@@ -314,7 +314,7 @@ type SearchResult struct {
 
 type SearchResults []SearchResult
 
-func (sr SearchResult) Play() {
+func (sr *SearchResult) Play() {
 	refreshPlayer()
 	defer refreshPlayer()
 	var opt spotify.PlayOptions
@@ -500,7 +500,7 @@ func searchAll(arg string) (SearchResults, error) {
 				Owner: owner.DisplayName,
 				Name:  pl.Name,
 				ID:    pl.ID,
-				URI:   &pl.URI,
+				URI:   &(pl.URI),
 				Type:  "playlist",
 			})
 		}
@@ -510,7 +510,7 @@ func searchAll(arg string) (SearchResults, error) {
 			results.Add(SearchResult{
 				Name: art.Name,
 				ID:   art.ID,
-				URI:  &art.URI,
+				URI:  &(art.URI),
 				Type: "artist",
 			})
 		}
@@ -525,7 +525,7 @@ func searchAll(arg string) (SearchResults, error) {
 				Name:    alb.Name,
 				ID:      alb.ID,
 				Artists: artists,
-				URI:     &alb.URI,
+				URI:     &(alb.URI),
 				Type:    "album",
 			})
 		}
