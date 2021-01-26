@@ -324,17 +324,29 @@ func (sr *SearchResult) Play() {
 	switch strings.ToLower(sr.Type) {
 	case "track":
 		opt.URIs = sr.URIs
-	case "album", "userplaylist":
+	case "userplaylist":
 		opt.PlaybackContext = sr.URI
+	case "album":
+		var err error
+		opt.URIs, err = collectAlbumURIs(sr.ID)
+		if err != nil {
+			fmt.Println("error:", err)
+			return
+		}
 	case "playlist":
-		uris, err := sr.collectPlaylistURIs()
+		var err error
+		opt.URIs, err = collectPlaylistURIs(sr.ID)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-		opt.URIs = uris
 	case "artist":
-		opt.PlaybackContext = sr.URI
+		var err error
+		opt.PlaybackContext, err = getArtistURI(sr.ID)
+		if err != nil {
+			fmt.Printf("error: %s\n", err)
+			return
+		}
 	default:
 		opt.PlaybackContext = sr.URI
 	}
@@ -346,8 +358,28 @@ func (sr *SearchResult) Play() {
 	fmt.Printf("playing %s\n", sr.Name)
 }
 
-func (sr SearchResult) collectPlaylistURIs() ([]spotify.URI, error) {
-	page, err := client.GetPlaylistTracks(sr.ID)
+func collectAlbumURIs(id spotify.ID) ([]spotify.URI, error) {
+	page, err := client.GetAlbumTracks(id)
+	if err != nil {
+		return nil, err
+	}
+	var uris []spotify.URI
+	for _, t := range page.Tracks {
+		uris = append(uris, t.URI)
+	}
+	return uris, nil
+}
+
+func getArtistURI(id spotify.ID) (*spotify.URI, error) {
+	art, err := client.GetArtist(id)
+	if err != nil {
+		return nil, err
+	}
+	return &(art.URI), nil
+}
+
+func collectPlaylistURIs(id spotify.ID) ([]spotify.URI, error) {
+	page, err := client.GetPlaylistTracks(id)
 	if err != nil {
 		return nil, err
 	}
