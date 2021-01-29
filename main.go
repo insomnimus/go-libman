@@ -1,22 +1,32 @@
-/*
-Copyright © 2021 insomnia
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
 package main
 
-import "github.com/insomnimus/libman/cmd"
+import (
+	"fmt"
+	"github.com/insomnimus/libman/cmd"
+	"os"
+	"strings"
+)
+
+const version = "0.9.7"
+
+func showVersion() {
+	fmt.Printf("libman version %s\n", version)
+}
 
 func main() {
-	cmd.Execute()
+	if len(os.Args) == 1 {
+		cmd.StartPlayerSession()
+		return
+	}
+	switch strings.ToLower(os.Args[1]) {
+	case "help", "-h", "--help":
+		cmd.ShowHelp()
+		return
+	case "version", "-v", "--version":
+		showVersion()
+		return
+	default:
+		fmt.Fprintf(os.Stderr, "unknown option/command %q\n", os.Args[1])
+		return
+	}
 }

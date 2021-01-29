@@ -8,11 +8,9 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"os/signal"
 	"strconv"
 	"strings"
 
-	"github.com/spf13/cobra"
 	"github.com/zmb3/spotify"
 )
 
@@ -46,59 +44,8 @@ var (
 
 var (
 	simplePlaylists []spotify.SimplePlaylist
-	//fullPlaylists []spotify.FullPlaylist
-	//selectedFull *spotify.FullPlaylist
-	selectedSimple *spotify.SimplePlaylist
+	selectedSimple  *spotify.SimplePlaylist
 )
-
-var liveCmd = &cobra.Command{
-	Use:   "live",
-	Short: "starts an authenticated spotify session",
-	Long:  `for editing of the personal spotify playlists`,
-	Run: func(cmd *cobra.Command, args []string) {
-		startLiveSession()
-	},
-}
-
-func startLiveSession() {
-	COMMAND = "live"
-	defer liveCleanup()
-	signal.Notify(terminator, os.Interrupt)
-
-	checkToken()
-	// load caches
-	err := db.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte("cache"))
-		stats := b.Stats()
-		if stats.KeyN > 0 {
-			c := b.Cursor()
-			for k, v := c.First(); k != nil; k, v = c.Next() {
-				if v == nil {
-					continue
-				}
-				var cache Cache
-				err := json.Unmarshal(v, &cache)
-				if err != nil {
-					return err
-				}
-
-				caches = append(caches, &cache)
-			}
-		}
-		return nil
-	})
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(2)
-	}
-	for {
-		parseLiveCommand(prompt())
-	}
-}
-
-func init() {
-	rootCmd.AddCommand(liveCmd)
-}
 
 func checkToken() {
 	if db == nil {
@@ -622,39 +569,6 @@ func helpDraft() {
 	fmt.Println(msg)
 }
 
-func parseLiveCommand(s string) {
-	fields := strings.Fields(s)
-	if len(fields) == 0 {
-		fmt.Print("\n")
-		return
-	}
-	switch strings.ToLower(fields[0]) {
-	case "select", "choose", "sel":
-		choosePlaylist(fields[1:])
-	case "edit", "e":
-		editSelectedPlaylist()
-	case "new", "create":
-		createPlaylist()
-	case "delete", "del", "remove":
-		deletePlaylist()
-	case "rename":
-		renamePlaylist(fields[1:])
-	case "load", "cache":
-		loadCache(fields[1:])
-	case "sync":
-		syncCache()
-	case "h", "help":
-		helpLive(fields[1:])
-	case "show", "display":
-		showLive(fields[1:])
-	case "caches":
-		listCaches()
-	default:
-		fmt.Printf("unknown command %q\n", concat(fields[1:]))
-	}
-
-}
-
 func createPlaylist() {
 	fmt.Println("creating new playlist")
 	fmt.Println("playlist name:")
@@ -678,143 +592,6 @@ func createPlaylist() {
 		return
 	}
 	fmt.Printf("created playlist %s\n", name)
-}
-
-func loadCache(args []string) {
-	if len(caches) == 0 {
-		fmt.Println("you don't have any caches, use `libman search` to manage local caches")
-		return
-	}
-	if len(args) > 0 {
-		name := concat(args)
-		for _, cache := range caches {
-			if strings.EqualFold(name, cache.Name) {
-				selectedCache = cache
-				fmt.Printf("loaded cache %s\n", cache.Name)
-				return
-			}
-		}
-		fmt.Printf("there are no caches with the name %s\n", name)
-		return
-	}
-
-	for i, cache := range caches {
-		fmt.Printf("%d- %s, %d tracks\n", i, cache.Name, len(cache.Tracks))
-	}
-	fmt.Printf("choose cache (0-%d), -1 or blank to cancel\n", len(caches)-1)
-	var input string
-	for {
-		input = prompt()
-		if input == "" || input == "-1" {
-			fmt.Println("cancelled")
-			return
-		}
-		index, err := strconv.Atoi(input)
-		if err != nil {
-			fmt.Println("invalid input, enter again:")
-			continue
-		}
-		if index < 0 || index >= len(caches) {
-			fmt.Printf("invalid input, enter 0-%d, blank or -1 to cancel:\n", len(caches)-1)
-			continue
-		}
-		selectedCache = caches[index]
-		fmt.Printf("loaded cache %s\n", selectedCache.Name)
-		return
-	}
-}
-
-func liveCleanup() {
-	defer db.Close()
-	if db == nil {
-		fmt.Println("db is nil, what the hell")
-		os.Exit(1)
-	}
-	if client == nil {
-		db.Close()
-		fmt.Println("warning, the client is nil")
-		os.Exit(1)
-	}
-	// save caches
-	err := db.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte("cache"))
-		for _, c := range caches {
-			data, err := json.MarshalIndent(c, "", "\t")
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "error doing cleanup: %s\n", err)
-				continue
-			}
-			b.Delete([]byte(c.Name))
-			err = b.Put([]byte(c.Name), data)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "error putting %s in db: %s\n", c.Name, err)
-				continue
-			}
-		}
-		return nil
-	})
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error updating cache database: %s\n", err)
-	}
-	// save token for later use
-
-	token, err := client.Token()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error saving token: %s\n", err)
-		db.Close()
-		os.Exit(1)
-	}
-	data, err := json.MarshalIndent(token, "", "\t")
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error marshaling token: %s\n", err)
-		db.Close()
-		os.Exit(1)
-	}
-	err = db.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte("token"))
-		err := b.Put([]byte("token"), data)
-		return err
-	})
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error saving token to db: %s\n", err)
-		db.Close()
-		os.Exit(1)
-	}
-
-}
-
-func helpLive(_ []string) {
-	msg := `commands:
-	#new
-	create a new playlist
-	
-	#choose/select
-	choose a playlist
-	
-	#load/cache
-	load a cache
-	
-	#list cache|playlist
-	list the selected playlists or caches tracks
-	
-	#caches
-	show the list of caches
-	`
-	fmt.Println(msg)
-}
-
-func showLive(args []string) {
-	if len(args) != 0 {
-		switch strings.ToLower(args[0]) {
-		case "cache", "c", "cac":
-			showCache(args[1:])
-		case "p", "playlist", "play", "pl":
-			showPlaylist(args[1:])
-		default:
-			fmt.Printf("unknown argument %s, arguments are:\nplaylist (p, pl, play)\ncache (c, cac)\n", args[0])
-			return
-		}
-	}
 }
 
 func renamePlaylist(args []string) {

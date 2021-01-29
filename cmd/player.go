@@ -12,11 +12,10 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	//"github.com/zmb3/spotify"
-	"github.com/spf13/cobra"
 )
 
 var (
+	client       *spotify.Client
 	repeatState  string = "off"
 	activeDevice *spotify.PlayerDevice
 	playerVolume = 80
@@ -24,26 +23,11 @@ var (
 	shuffleState bool
 )
 
-var playerCmd = &cobra.Command{
-	Use:   "player",
-	Short: "start the player",
-	Long:  `starts the player mode`,
-	Run: func(cmd *cobra.Command, args []string) {
-		startPlayerSession()
-	},
-}
-
-func init() {
-	rootCmd.AddCommand(playerCmd)
-}
-
-func startPlayerSession() {
-	COMMAND = "player"
+func StartPlayerSession() {
 	rand.Seed(time.Now().UnixNano())
 	signal.Notify(terminator, os.Interrupt)
 	checkToken()
 	initPlayer()
-	//fmt.Printf("welcome %s\n", user.DisplayName)
 	for {
 		parsePlayerCommand(prompt())
 	}

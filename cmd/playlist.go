@@ -93,55 +93,6 @@ func showPlaylist(args []string) {
 	}
 }
 
-func syncCache() {
-	if selectedCache == nil {
-		fmt.Println("you must load a cache first with `load`")
-		return
-	}
-	if selectedSimple == nil {
-		fmt.Println("you must first select a playlist with `select`")
-		return
-	}
-	if len(selectedCache.Tracks) == 0 {
-		fmt.Printf("cache %s has no tracks in it.\n", selectedCache.Name)
-		return
-	}
-	plTracks, err := client.GetPlaylistTracks(selectedSimple.ID)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error fetching playlist %s: %s\n", selectedSimple.Name, err)
-		return
-	}
-	temp := &Playlist{Name: selectedSimple.Name, ID: selectedSimple.ID.String()}
-LOOP:
-	for _, track := range selectedCache.Tracks {
-		for _, t := range plTracks.Tracks {
-			if string(t.Track.ID) == track.ID {
-				temp.Tracks = append(temp.Tracks, track)
-				continue LOOP
-			}
-		}
-		temp.addCache = append(temp.addCache, track)
-	}
-	if len(temp.Tracks) == len(plTracks.Tracks) {
-		fmt.Printf("cache %s doesn't have any new tracks, no changes made\nwould you like to empty the cache? y/n\n", selectedCache.Name)
-		if yesOrNo() {
-			selectedCache.Tracks = nil
-			fmt.Printf("emptyed %s\n", selectedCache.Name)
-			return
-		}
-		fmt.Println("returning")
-		return
-	}
-	temp.Commit()
-	fmt.Println("would you like to empty the cache? (y/n)")
-	if yesOrNo() {
-		selectedCache.Tracks = nil
-		fmt.Println("emptyed")
-		return
-	}
-	fmt.Println("did not empty, returning")
-}
-
 func deletePlaylist() {
 	fmt.Println("not supported yet")
 }

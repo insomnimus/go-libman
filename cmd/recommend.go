@@ -120,10 +120,6 @@ func recommend(args []string) {
 
 func show(args []string) {
 	if len(args) == 0 {
-		if COMMAND != "player" {
-			fmt.Println("missing argument for show")
-			return
-		}
 		showCurrentlyPlaying()
 		return
 	}
