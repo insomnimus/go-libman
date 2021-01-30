@@ -103,14 +103,14 @@ func init() {
 		}
 	}
 	if id == "" {
-		id := os.Getenv("SPOTIFY_ID")
+		id = os.Getenv("SPOTIFY_ID")
 		if id == "" {
 			fmt.Fprintf(os.Stderr, "please set your SPOTIFY_ID variable either in %s (gihest priority) or in your environment\n", configPath)
 			os.Exit(2)
 		}
 	}
 	if secret == "" {
-		secret := os.Getenv("SPOTIFY_SECRET")
+		secret = os.Getenv("SPOTIFY_SECRET")
 		if secret == "" {
 			fmt.Fprintf(os.Stderr, "please set your SPOTIFY_SECRET variable either in %s (gihest priority) or in your environment\n", configPath)
 			os.Exit(2)
