@@ -14,6 +14,8 @@ const helpText = `
 	To start a session, run the application with no arguments.
 	
 	subcommands:
+	#config: get details about configuration
+	#reset: reset config or db
 	#version: display the libman version
 	#help: show this message
 	
@@ -28,6 +30,8 @@ const helpText = `
 	
 	you will have to register an application at: https://developer.spotify.com/my-applications/
 	- Use "http://localhost:8080/callback" as the redirect URI
+	
+	If you don't want to use env variables, run the "libman config" command for more options.
 	`
 
 var (

@@ -17,8 +17,8 @@ func GetDataHome() string {
 
 // GetConfigHome returns the user config directory.
 func GetConfigHome() string {
-	if userSet != "" {
-		return userSet
+	if userConfig!= "" {
+		return userConfig
 	}
 	return getRoamingAppDataDir()
 }

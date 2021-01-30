@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/boltdb/bolt"
+	"github.com/insomnimus/libman/userdir"
 	"golang.org/x/oauth2"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -46,6 +48,76 @@ var (
 	simplePlaylists []spotify.SimplePlaylist
 	selectedSimple  *spotify.SimplePlaylist
 )
+
+func init() {
+	// check if config contains client id and secret
+	configPath := userdir.GetConfigHome() + "/libman.config"
+	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+		// create an empty config file
+		configDir := userdir.GetConfigHome()
+		err := os.MkdirAll(configDir, 0600)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error initializing the config path: %s\n", err)
+			os.Exit(2)
+		}
+		err = ioutil.WriteFile(configPath, []byte(TemplateConfig), 0600)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error creating the template config file: %s\n", err)
+			os.Exit(2)
+		}
+		id := os.Getenv("SPOTIFY_ID")
+		secret := os.Getenv("SPOTIFY_SECRET")
+		if id == "" || secret == "" {
+			fmt.Fprintf(os.Stderr, "please either set the 'SPOTIFY_ID' and 'SPOTIFY_SECRET' env variables or edit the config file located at %s\n", configPath)
+			os.Exit(2)
+		}
+	}
+	// read config
+	data, err := ioutil.ReadFile(configPath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error reading the config file: %s\n", err)
+		os.Exit(2)
+	}
+	lines := strings.Split(string(data), "\n")
+	var id, secret string
+	for _, l := range lines {
+		if len(l) <= 10 {
+			continue
+		}
+		if l[0] == '#' || l[0] == ' ' {
+			continue
+		}
+		if l[:2] == "id" {
+			temp := strings.SplitN(l, " ", 2)
+			if len(temp) != 2 {
+				continue
+			}
+			id = temp[1]
+		}
+		if l[:6] == "secret" {
+			temp := strings.SplitN(l, " ", 2)
+			if len(temp) != 2 {
+				continue
+			}
+			secret = temp[1]
+		}
+	}
+	if id == "" {
+		id := os.Getenv("SPOTIFY_ID")
+		if id == "" {
+			fmt.Fprintf(os.Stderr, "please set your SPOTIFY_ID variable either in %s (gihest priority) or in your environment\n", configPath)
+			os.Exit(2)
+		}
+	}
+	if secret == "" {
+		secret := os.Getenv("SPOTIFY_SECRET")
+		if secret == "" {
+			fmt.Fprintf(os.Stderr, "please set your SPOTIFY_SECRET variable either in %s (gihest priority) or in your environment\n", configPath)
+			os.Exit(2)
+		}
+	}
+	auth.SetAuthInfo(id, secret)
+}
 
 func checkToken() {
 	if db == nil {
@@ -93,6 +165,7 @@ func authorize() {
 		fmt.Fprintf(os.Stderr, "error authorizing: %s\n", err)
 		os.Exit(1)
 	}
+	fmt.Println("logged in!")
 	client = clt
 	user = usr
 	token, err := client.Token()

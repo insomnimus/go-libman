@@ -9,3 +9,10 @@ func GetDataHome() string {
 	}
 	return os.Getenv("HOME") + "/.local"
 }
+
+func GetConfigHome() string{
+	if userConfig != ""{
+		return userConfig
+	}
+	return os.Getenv("HOME") + "/.config"
+}
