@@ -78,7 +78,7 @@ func recommend(args []string) {
 	}
 	tempTracks := trPage.Tracks
 	var tracks []spotify.FullTrack
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 5 && i < len(tempTracks); i++ {
 		rn := rand.Intn(len(tempTracks))
 		tracks = append(tracks, tempTracks[rn].Track)
 		tempTracks = append(tempTracks[:rn], tempTracks[rn+1:]...)
