@@ -512,6 +512,12 @@ func (p *Playlist) Commit() {
 			}
 			tempIDs = append(tempIDs, id)
 		}
+		if len(tempIDs) == 0 {
+			fmt.Println("no new tracks given, skipped")
+			if len(dels) == 0 {
+				return
+			}
+		}
 		adds = tempIDs
 
 		_, err = client.AddTracksToPlaylist(spotify.ID(p.ID), adds...)
