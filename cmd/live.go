@@ -496,12 +496,30 @@ func (p *Playlist) Commit() {
 		dels = append(dels, spotify.ID(t.ID))
 	}
 	if len(adds) > 0 {
-		_, err := client.AddTracksToPlaylist(spotify.ID(p.ID), adds...)
+		// check for dupes
+		page, err := client.GetPlaylistTracks(spotify.ID(p.ID))
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error getting the palylist data: %s\n", err)
+			return
+		}
+		var tempIDs []spotify.ID
+	LOOP:
+		for _, id := range adds {
+			for _, trk := range page.Tracks {
+				if trk.Track.ID == id {
+					continue LOOP
+				}
+			}
+			tempIDs = append(tempIDs, id)
+		}
+		adds = tempIDs
+
+		_, err = client.AddTracksToPlaylist(spotify.ID(p.ID), adds...)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error adding tracks to %s: %s\n", p.Name, err)
 			return
 		}
-		fmt.Printf("successfully committed new tracks to %s\n", p.Name)
+		fmt.Printf("committed new tracks to %s\n", p.Name)
 		p.addCache = nil
 	}
 	if len(dels) > 0 {
@@ -510,10 +528,10 @@ func (p *Playlist) Commit() {
 			fmt.Fprintf(os.Stderr, "error removing tracks from %s: %s\n", p.Name, err)
 			return
 		}
-		fmt.Printf("successfully committed removing tracks from %s\n", p.Name)
+		fmt.Printf("removed tracks from %s\n", p.Name)
 		p.removeCache = nil
 	}
-	fmt.Println("done")
+	//fmt.Println("done")
 }
 
 func (p *Playlist) Review() {
