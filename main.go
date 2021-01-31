@@ -19,7 +19,7 @@ func showConfigMsg() {
 	fmt.Printf("if you don't want to use env variables for your spotify id and secret,\n"+
 		"you can edit libman.config file located at %s\n instead.\n\n"+
 		"if the config file is missing or corrupted, use `libman reset config` to get a new one.\n"+
-		"you can set the LIBMAN_CONFIG_PATH variable to change the default config path.\n", userdir.GetConfigHome()+"/libman")
+		"you can set the LIBMAN_CONFIG_PATH variable to change the default config path.\n", userdir.GetConfigHome()+"/libman.config")
 	os.Exit(0)
 }
 
