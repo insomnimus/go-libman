@@ -441,8 +441,23 @@ func (srs *SearchResults) chooseInteractive() {
 	} else {
 		displays.Add(alb...)
 	}
-	for i, res := range displays {
-		fmt.Printf("%d- %s\n", i, res)
+	for i, r := range displays {
+		switch strings.ToLower(r.Type) {
+		case "track":
+			fmt.Printf("#%-2d %-10s %-20s by %-20s\n",
+				i, "track", r.Name, strings.Join(r.Artists, ", "))
+		case "playlist", "userplaylist":
+			fmt.Printf("#%-2d %-10s %-20s by %-20s\n",
+				i, "playlist", r.Name, r.Owner)
+		case "artist":
+			fmt.Printf("#%-2d %-10s %-45s\n",
+				i, "artist", r.Name)
+		case "album":
+			fmt.Printf("#%-2d %-10s %-20s by %-20s\n",
+				i, "album", r.Name, strings.Join(r.Artists, ", "))
+		default:
+			fmt.Printf("#%-2d %-10s %-45s\n", i, "-", r.Name)
+		}
 	}
 	var input string
 	fmt.Printf("choose (0-%d), blank or -1 to cancel:\n", len(displays))

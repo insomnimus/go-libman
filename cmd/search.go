@@ -24,8 +24,23 @@ func (srs *SearchResults) ChooseInteractiveBare() {
 	if len(*srs) == 0 {
 		return
 	}
-	for i, res := range *srs {
-		fmt.Printf("%d- %s\n", i, res.StringBare())
+	for i, r := range *srs {
+		switch strings.ToLower(r.Type) {
+		case "track":
+			fmt.Printf("#%-2d %-30s by %-30s\n",
+				i, r.Name, strings.Join(r.Artists, ", "))
+		case "playlist", "userplaylist":
+			fmt.Printf("#%-2d %-30s by %-25s\n",
+				i, r.Name, r.Owner)
+		case "artist":
+			fmt.Printf("#%-2d %-45s\n",
+				i, r.Name)
+		case "album":
+			fmt.Printf("#%-2d %-40s by %-30s\n",
+				i, r.Name, strings.Join(r.Artists, ", "))
+		default:
+			fmt.Printf("#%-2d %-45s\n", i, r.Name)
+		}
 	}
 	var input string
 	fmt.Printf("choose (0-%d), blank or -1 to cancel:\n", len(*srs))
