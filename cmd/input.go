@@ -59,7 +59,6 @@ func yesOrNo() bool {
 			fmt.Println("please enter yes or no (y/n)")
 		}
 	}
-	return false
 }
 
 func concat(args []string) string {

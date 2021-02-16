@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-const version = "0.9.7"
+const version = "0.10.07"
 
 func showVersion() {
 	fmt.Printf("libman version %s\n", version)

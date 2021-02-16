@@ -289,11 +289,12 @@ func showCurrentlyPlaying() {
 }
 
 type SearchResult struct {
-	Name, Artists, Owner string
-	URI                  *spotify.URI
-	URIs                 []spotify.URI
-	Type                 string
-	ID                   spotify.ID
+	Name, Owner string
+	Artists     []string
+	URI         *spotify.URI
+	URIs        []spotify.URI
+	Type        string
+	ID          spotify.ID
 }
 
 type SearchResults []SearchResult
@@ -384,17 +385,16 @@ func collectPlaylistURIs(id spotify.ID) ([]spotify.URI, error) {
 func (sr SearchResult) String() string {
 	switch strings.ToLower(sr.Type) {
 	case "track", "song":
-		return fmt.Sprintf("track - %s by %s", sr.Name, sr.Artists)
+		return fmt.Sprintf("track - %s by %s", sr.Name, strings.Join(sr.Artists, ", "))
 	case "playlist":
 		return fmt.Sprintf("playlist - %s | %s", sr.Name, sr.Owner)
 	case "artist":
 		return fmt.Sprintf("artist - %s", sr.Name)
 	case "album":
-		return fmt.Sprintf("album - %s by %s", sr.Name, sr.Artists)
+		return fmt.Sprintf("album - %s by %s", sr.Name, strings.Join(sr.Artists, ", "))
 	default:
 		return fmt.Sprintf("result - %s", sr.Name)
 	}
-	return fmt.Sprintf("result - %s", sr.Name)
 }
 
 func (srs *SearchResults) Add(res ...SearchResult) {
@@ -490,9 +490,9 @@ func searchAll(arg string) (SearchResults, error) {
 	var results SearchResults
 	if page.Tracks != nil && len(page.Tracks.Tracks) > 0 {
 		for _, t := range page.Tracks.Tracks {
-			artists := ""
-			for _, art := range t.Artists {
-				artists += art.Name + ", "
+			artists := make([]string, len(t.Artists))
+			for i, art := range t.Artists {
+				artists[i] = art.Name
 			}
 			results.Add(SearchResult{
 				ID:      t.ID,
@@ -533,9 +533,9 @@ func searchAll(arg string) (SearchResults, error) {
 	}
 	if page.Albums.Albums != nil && len(page.Albums.Albums) > 0 {
 		for _, alb := range page.Albums.Albums {
-			artists := ""
-			for _, art := range alb.Artists {
-				artists += art.Name + ", "
+			artists := make([]string, len(alb.Artists))
+			for i, art := range alb.Artists {
+				artists[i] = art.Name
 			}
 			results.Add(SearchResult{
 				Name:    alb.Name,
@@ -593,7 +593,7 @@ func playUserPlaylist(args []string) {
 			temp.Play()
 			return
 		}
-		return
+
 	}
 	name := concat(args)
 	for _, p := range pls {

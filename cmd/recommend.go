@@ -144,6 +144,6 @@ func (rec *Recommendation) Show() {
 		fmt.Printf("%d- %s\n", i, t)
 	}
 	if len(rec.Tracks) > 25 {
-		fmt.Println("only showing 25 out of %d, though rest is also playable\n", len(rec.Tracks))
+		fmt.Printf("only showing 25 out of %d, though rest is also playable\n", len(rec.Tracks))
 	}
 }

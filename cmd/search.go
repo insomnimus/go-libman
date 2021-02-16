@@ -73,9 +73,9 @@ func search(arg string, sType spotify.SearchType) (SearchResults, error) {
 	var results SearchResults
 	if page.Tracks != nil && len(page.Tracks.Tracks) > 0 {
 		for _, t := range page.Tracks.Tracks {
-			artists := ""
-			for _, art := range t.Artists {
-				artists += art.Name + ", "
+			artists := make([]string, len(t.Artists))
+			for i, art := range t.Artists {
+				artists[i] = art.Name
 			}
 			results.Add(SearchResult{
 				ID:      t.ID,
@@ -116,9 +116,9 @@ func search(arg string, sType spotify.SearchType) (SearchResults, error) {
 	}
 	if page.Albums != nil && page.Albums.Albums != nil {
 		for _, alb := range page.Albums.Albums {
-			artists := ""
-			for _, art := range alb.Artists {
-				artists += art.Name + ", "
+			artists := make([]string, len(alb.Artists))
+			for i, art := range alb.Artists {
+				artists[i] = art.Name
 			}
 			results.Add(SearchResult{
 				Name:    alb.Name,

@@ -79,6 +79,12 @@ func parsePlayerCommand(s string) {
 		cycleRepeatState(fields[1:])
 	case "recommend", "rec", "recom":
 		recommend(fields[1:])
+	case "ls":
+		if len(fields) == 0 {
+			fmt.Println("missing argument `playlist` for `ls`")
+			return
+		}
+		show(fields[1:])
 	case "show", "sh":
 		show(fields[1:])
 	default:
