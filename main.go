@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-const version = "0.12.0"
+const version = "0.12.1"
 
 func showVersion() {
 	fmt.Printf("libman version %s\n", version)
