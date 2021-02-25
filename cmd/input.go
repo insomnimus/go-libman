@@ -11,7 +11,12 @@ import (
 var (
 	reader     = bufio.NewReader(os.Stdin)
 	terminator = make(chan os.Signal, 1)
+	PROMPT     = "libman> "
 )
+
+func init() {
+	PROMPT = LibmanConfig.Prompt
+}
 
 func prompt() string {
 	ch := make(chan string, 0)
@@ -28,7 +33,7 @@ func prompt() string {
 }
 
 func PromptNormal() string {
-	fmt.Print("libman> ")
+	fmt.Print(PROMPT)
 	text, _ := reader.ReadString('\n')
 	text = strings.Replace(text, "\r\n", "", -1)
 	text = strings.Replace(text, "\n", "", -1)
