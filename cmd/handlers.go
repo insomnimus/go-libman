@@ -60,16 +60,16 @@ func parsePlayerCommand(s string) {
 	case "add", "save", "saveto":
 		saveCurrentlyPlaying(fields[1:])
 	case "h", "help":
-		playerHelp()
+		playerHelp(fields[1:]...)
 	case "mute":
 		changeVolume("-100")
 	case "what", "?", "current":
 		showCurrentlyPlaying()
-	case "playlists", "pl":
+	case "playlists", "pl", "playlist":
 		playUserPlaylist(fields[1:])
 	case "volume", "vol":
 		volume(fields[1:])
-	case "device":
+	case "device", "dev":
 		chooseDevice()
 	case "create", "new":
 		createPlaylist()
@@ -80,10 +80,6 @@ func parsePlayerCommand(s string) {
 	case "recommend", "rec", "recom":
 		recommend(fields[1:])
 	case "ls":
-		if len(fields) == 0 {
-			fmt.Println("missing argument `playlist` for `ls`")
-			return
-		}
 		show(fields[1:])
 	case "show", "sh":
 		show(fields[1:])
@@ -92,8 +88,9 @@ func parsePlayerCommand(s string) {
 	}
 }
 
-func playerHelp() {
-	msg := `
+func playerHelp(args ...string) {
+	if len(args) == 0 {
+		msg := `
 	you can enter blank to play/pause
 	you can change the volume by doing - or + followed by a number
 	you can play next/prev song with >/< or next/prev
@@ -138,7 +135,6 @@ func playerHelp() {
 	#recommend|rec <playlist name>
 	get recommendations based on a user playlist
 	
-	
 	#salb, sart, stra, spla:
 	search for albums, artists, tracks or playlists respectively
 	
@@ -148,6 +144,114 @@ func playerHelp() {
 	
 	#mute
 	mute
+	
+	use 'help <command>' to get more info about a command
 	`
-	fmt.Println(msg)
+		fmt.Println(msg)
+		return
+	}
+	arg := concat(args)
+	p := fmt.Printf
+	switch strings.ToLower(arg) {
+	case "s", "search":
+		p(`#search (s) <search term>
+		search anything musical
+		example:
+		's nightwish
+		you can also use the 'track::artist' syntax
+		s sahara::nightwish`)
+	case "pl", "playlist":
+		p(`#playlist (pl) [one of your playlists]
+		play one of your playlists
+		omit the playlist name to choose interactively`)
+	case "strack", "stra":
+		p(`#strack (stra) <track name>
+		search for a track by its name
+		example:
+		stra and plague flowers the kaleidoscope
+		this command also supports 'track::artist' syntax
+		stra and plague flowers the kaleidoscope::ne obliviscaris`)
+	case "sartist", "sart":
+		p(`#sartist (sart) <artist name>
+		search for an artist by their name
+		example:
+		sart insomnium`)
+	case "salbum", "salb":
+		p(`#salbum (salb) <album name>
+		search for an album by its name, supports 'album::artist' syntax
+		examples:
+		salb ocean soul
+		salb winter's gate::insomnium`)
+	case "spla", "splaylist":
+		p(`#splaylist (spla) <playlist name>
+		search for a public spotify playlist by its name
+		examples:
+		spla death metal
+		spla this is amorphis`)
+	case "shuffle", "shuf":
+		p(`#shuffle (shuf) [on/off]
+		toggle shoffle
+		if called without any arguments, toggles the shuffle state
+		otherwise sets the shuffle state to on or off
+		examples:
+		shuffle
+		shuffle off`)
+	case "choose", "select":
+		p(`#choose (select)
+		select one of your playlists to edit
+		does not affect playback`)
+	case "edit":
+		p(`#edit
+		edit the selected playlist`)
+	case "show", "sh":
+		p(`#show (sh) [rec|playlist name]
+		if called with no arguments, shows currently playing track
+		if called with arguments;
+		if the argument is "rec", shows the most recent recommendations list
+		otherwise shows one of your playlists contents
+		examples:
+		
+		show
+		show rec
+		show metal`)
+	case "ls":
+		p(`#ls
+		currently is the same as 'show'`)
+	case "add", "save":
+		p(`#save (add) [playlist name]
+		saves the currently playing track to the specified playlist
+		if no playlist name is given, you get to choose interactively`)
+	case "rep", "repeat":
+		p(`#repeat (rep) [off/track/context]
+		toggle repeat state`)
+	case "vol", "volume":
+		p(`#volume (vol) [percentage]
+		set the volume
+		if used without any argument, displays it instead`)
+	case ">", "next":
+		p(`#next (>)
+		play the next track`)
+	case "previous", "prev", "<":
+		p(`#prev (<)
+		play the previous track`)
+	case "mute":
+		p(`#mute
+		mute the volume`)
+	case "device", "dev":
+		p(`#device (dev)
+		choose the playback device`)
+	case "create":
+		p(`#create
+	create a new playlist`)
+	case "rename":
+		p(`#rename old>>new
+	rename one of your playlists`)
+	case "rec", "recommend":
+		p(`#recommend (rec) [playlist name]
+	generate some recommendations based on the given playlist name (has to be one of your playlists)
+	if used without any argument, displays the most recent recommendations list`)
+	default:
+		p("unknown command %q", arg)
+	}
+	fmt.Print("\n")
 }
