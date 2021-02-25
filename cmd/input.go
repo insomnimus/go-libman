@@ -9,9 +9,9 @@ import (
 )
 
 var (
-	reader     = bufio.NewReader(os.Stdin)
-	terminator = make(chan os.Signal, 1)
-	PROMPT     = "libman> "
+	reader            = bufio.NewReader(os.Stdin)
+	terminator        = make(chan os.Signal, 1)
+	PROMPT     string = "libman> "
 )
 
 func init() {
@@ -33,7 +33,7 @@ func prompt() string {
 }
 
 func PromptNormal() string {
-	fmt.Print(PROMPT)
+	fmt.Print("> ")
 	text, _ := reader.ReadString('\n')
 	text = strings.Replace(text, "\r\n", "", -1)
 	text = strings.Replace(text, "\n", "", -1)
@@ -41,7 +41,7 @@ func PromptNormal() string {
 }
 
 func PromptChan(ch chan<- string) {
-	fmt.Print(">")
+	fmt.Print(PROMPT)
 	text, _ := reader.ReadString('\n')
 	text = strings.Replace(text, "\r\n", "", -1)
 	ch <- text
