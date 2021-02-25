@@ -1,26 +1,38 @@
 // +build windows
+
 package userdir
 
 import (
+	"os"
 	"strings"
 	"syscall"
 	"unsafe"
 )
 
-// GetDataHome returns the user data directory.
-func GetDataHome() string {
-	if userSet != "" {
-		return userSet
+func LibmanDBDir() string {
+	if dir := os.Getenv("LIBMAN_DB_PATH"); dir != "" {
+		switch dir[len(dir)-1] {
+		case '/', '\\':
+			return dir[:len(dir)-1]
+		default:
+			return dir
+		}
 	}
-	return getRoamingAppDataDir()
+
+	return getRoamingAppDataDir() + "/libman"
 }
 
-// GetConfigHome returns the user config directory.
-func GetConfigHome() string {
-	if userConfig!= "" {
-		return userConfig
+func LibmanConfigDir() string {
+	if conf := os.Getenv("LIBMAN_CONFIG_PATH"); conf != "" {
+		switch conf[len(conf)-1] {
+		case '/', '\\':
+			return conf[:len(conf)-1]
+		default:
+			return conf
+		}
 	}
-	return getRoamingAppDataDir()
+
+	return getRoamingAppDataDir() + "/libman"
 }
 
 var (

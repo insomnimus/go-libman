@@ -45,7 +45,7 @@ Configuration
 -	Set `http://localhost:8080/callback` as the callback URI, this is important.
 -	Now set the `SPOTIFY_ID` and `SPOTIFY_SECRET` environment variable to what you got in step 1.
 
-If you don't want to use environment variables, run `libman config` for the location of the config file and put them there`
+If you don't want to use environment variables, run `libman config` for the location of the config file and put them there
 
 You're ready, start libman by calling it bare:
 

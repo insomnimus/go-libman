@@ -28,7 +28,7 @@ func prompt() string {
 }
 
 func PromptNormal() string {
-	fmt.Print("> ")
+	fmt.Print("libman> ")
 	text, _ := reader.ReadString('\n')
 	text = strings.Replace(text, "\r\n", "", -1)
 	text = strings.Replace(text, "\n", "", -1)

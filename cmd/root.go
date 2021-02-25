@@ -5,7 +5,9 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/insomnimus/libman/userdir"
 	"github.com/zmb3/spotify"
+	"log"
 	"os"
+	"path/filepath"
 )
 
 const helpText = `
@@ -35,20 +37,12 @@ const helpText = `
 	`
 
 var (
-	dbPath string = userdir.GetDataHome() + "/libman"
-	dbName string = dbPath + "/libman.db"
-	db     *bolt.DB
+	LibmanConfig = userdir.LibmanConfig()
+	db           *bolt.DB
 )
 
 func init() {
-	if _, err := os.Stat(dbPath); os.IsNotExist(err) {
-		if fileErr := os.MkdirAll(dbPath, 0764); fileErr != nil {
-			fmt.Fprintf(os.Stderr, "failed to create a directory for database in %s\n", fileErr)
-			os.Exit(1)
-		}
-		fmt.Printf("created a directory in %s\n", dbPath)
-	}
-	if _, err := os.Stat(dbName); os.IsNotExist(err) {
+	if _, err := os.Stat(LibmanConfig.DBPath); os.IsNotExist(err) {
 		fmt.Println("no database detected, initializing one")
 		initDB()
 		fmt.Println("db created")
@@ -89,7 +83,12 @@ func (t Track) String() string {
 }
 
 func initDB() {
-	db, err := bolt.Open(dbName, 0600, nil)
+	dbDir := filepath.Dir(LibmanConfig.DBPath)
+	err := os.MkdirAll(dbDir, 0600)
+	if err != nil {
+		log.Fatal(err)
+	}
+	db, err := bolt.Open(LibmanConfig.DBPath, 0600, nil)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error creating database:\n%s\n", err)
 		os.Exit(1)

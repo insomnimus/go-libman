@@ -1,18 +1,25 @@
 // +build linux
+
 package userdir
 
 import "os"
 
-func GetDataHome() string {
-	if userSet != "" {
-		return userSet
+func LibmanDBDir() string {
+	if dir := os.Getenv("LIBMAN_DB_PATH"); dir != "" {
+		if dir[len(dir)-1] == '/' {
+			return dir[len(dir)-1]
+		}
+		return dir
 	}
-	return os.Getenv("HOME") + "/.local"
+	return os.Getenv("HOME") + "/.local/libman"
 }
 
-func GetConfigHome() string{
-	if userConfig != ""{
-		return userConfig
+func LibmanConfigDir() string {
+	if conf := os.Getenv("LIBMAN_CONFIG_PATH"); conf != "" {
+		if conf[len(conf)-1] == '/' {
+			return conf[:len(conf)-1]
+		}
+		return conf
 	}
-	return os.Getenv("HOME") + "/.config"
+	return os.Getenv("HOME") + "/.config/libman"
 }
