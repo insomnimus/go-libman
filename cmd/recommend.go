@@ -131,6 +131,8 @@ func show(args []string) {
 			return
 		}
 		recommendations.Show()
+	case "pl", "playlists", "playlist":
+		listPlaylists()
 	default:
 		showPlaylist(args)
 	}

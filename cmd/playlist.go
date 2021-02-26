@@ -97,8 +97,10 @@ func showPlaylist(args []string) {
 				}
 				fmt.Printf("#%-2d | %-25s | %25s\n", i, t.Track.Name, strings.Join(artists, ", "))
 			}
+			return
 		}
 	}
+	fmt.Printf("you don't seem to have any playlist by the name %s\n", name)
 }
 
 func deletePlaylist(args []string) {
