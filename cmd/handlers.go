@@ -89,6 +89,8 @@ func parsePlayerCommand(s string) {
 			return
 		}
 		setPrompt(fields[1:]...)
+	case "remove", "rm":
+		removeCurrentlyPlaying(fields[1:])
 	default:
 		fmt.Printf("unknown command %q\n", fields[0])
 	}
@@ -256,6 +258,11 @@ func playerHelp(args ...string) {
 		p(`#recommend (rec) [playlist name]
 	generate some recommendations based on the given playlist name (has to be one of your playlists)
 	if used without any argument, displays the most recent recommendations list`)
+	case "rm", "remove":
+		p(`#remove (rm) [playlist name]
+	remove currently playing track from a playlist
+	if the playlist name is omitted, the last played playlist will be assumed
+	this command does not prompt for confirmation`)
 	default:
 		p("unknown command %q", arg)
 	}

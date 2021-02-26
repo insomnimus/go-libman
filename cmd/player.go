@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/boltdb/bolt"
 	"github.com/zmb3/spotify"
+	"log"
 	"math/rand"
 	"os"
 	"os/signal"
@@ -15,6 +16,7 @@ import (
 )
 
 var (
+	lastPl       *Playlist
 	client       *spotify.Client
 	repeatState  string = "off"
 	activeDevice *spotify.PlayerDevice
@@ -24,6 +26,8 @@ var (
 )
 
 func StartPlayerSession() {
+	log.SetFlags(0)
+	log.SetPrefix("")
 	rand.Seed(time.Now().UnixNano())
 	signal.Notify(terminator, os.Interrupt)
 	checkToken()
@@ -481,6 +485,7 @@ func (srs *SearchResults) chooseInteractive() {
 	}
 }
 
+// unused
 func searchAll(arg string) (SearchResults, error) {
 	if arg == "" {
 		return nil, fmt.Errorf("missing argument `query` for search")
@@ -606,6 +611,10 @@ func playUserPlaylist(args []string) {
 				URI:  &pls[index].URI,
 				Name: pls[index].Name,
 			}
+			lastPl = &Playlist{
+				Name: pls[index].Name,
+				ID:   pls[index].ID.String(),
+			}
 			temp.Play()
 			return
 		}
@@ -619,6 +628,10 @@ func playUserPlaylist(args []string) {
 				Name: p.Name,
 				ID:   p.ID,
 				URI:  &p.URI,
+			}
+			lastPl = &Playlist{
+				Name: p.Name,
+				ID:   p.ID.String(),
 			}
 			temp.Play()
 			return

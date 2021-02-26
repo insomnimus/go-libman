@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/zmb3/spotify"
+	"log"
 	"os"
 	"strings"
 )
@@ -126,4 +127,46 @@ func getPlaylist(name string) (*Playlist, error) {
 		}
 	}
 	return nil, fmt.Errorf("no playlist by the name %s found", name)
+}
+
+func removeCurrentlyPlaying(args []string) {
+
+	name := concat(args)
+	switch strings.ToLower(name) {
+	case "":
+		if lastPl == nil {
+			fmt.Println("no playlist log found, returning")
+			return
+		}
+		track, err := currentlyPlayingTrack()
+		if err != nil {
+			log.Printf("could not fetch currently playing: %s\n", err)
+			return
+		}
+		_, err = client.RemoveTracksFromPlaylist(spotify.ID(lastPl.ID), spotify.ID(track.ID))
+		if err != nil {
+			log.Printf("could not remove track: %s\n", err)
+			return
+		}
+		fmt.Printf("removed %s from %s\n", track.Name, lastPl.Name)
+		return
+		// TODO: implement fave folder
+		//case "fav", "favourites":
+	}
+	pl, err := getPlaylist(name)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	track, err := currentlyPlayingTrack()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	_, err = client.RemoveTracksFromPlaylist(spotify.ID(pl.ID), spotify.ID(track.ID))
+	if err != nil {
+		log.Printf("could not remove track: %s\n", err)
+		return
+	}
+	fmt.Printf("removed %s from %s\n", track.Name, pl.Name)
 }

@@ -19,7 +19,7 @@ func init() {
 }
 
 func prompt() string {
-	ch := make(chan string, 0)
+	ch := make(chan string)
 	go PromptChan(ch)
 	for {
 		select {
@@ -48,7 +48,7 @@ func PromptChan(ch chan<- string) {
 }
 
 func minutes(d int) string {
-	return fmt.Sprintf("%s", time.Duration(d)*time.Millisecond)
+	return (time.Duration(d) * time.Millisecond).String()
 }
 
 func yesOrNo() bool {
