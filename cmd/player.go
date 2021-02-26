@@ -637,7 +637,7 @@ func playUserPlaylist(args []string) {
 			return
 		}
 	}
-	fmt.Printf("couldn't find any playlist of yours called %s\n", name)
+	fmt.Printf("you don't seem to have any playlist by the name %s\n", name)
 }
 
 func toggleShuffle(args []string) {
