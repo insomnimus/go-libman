@@ -28,8 +28,9 @@ func listPlaylists() {
 		fmt.Fprintln(os.Stderr, err)
 		return
 	}
+	fmt.Printf(" %-2s | %35s\n", "no", "playlist")
 	for i, p := range pls {
-		fmt.Printf("%d- %s\n", i, p.Name)
+		fmt.Printf("#%-2d | %35s\n", i, p.Name)
 	}
 }
 
@@ -48,19 +49,22 @@ func showPlaylist(args []string) {
 			fmt.Printf("%s has no tracks in it\n", selectedSimple.Name)
 			return
 		}
+		fmt.Printf(" %-2s | %-25s | %25s\n",
+			"no", "title", "artist")
 		for i, t := range results.Tracks {
 			if i == 40 {
 				fmt.Println("use `edit` to potentially see more tracks")
 			}
-			artists := ""
+			var artists []string
 			for _, art := range t.Track.Artists {
-				artists += art.Name + ", "
+				artists = append(artists, art.Name)
 			}
-			fmt.Printf("%d- %s by %s\n", i, t.Track.Name, artists)
+			fmt.Printf("#%-2d | %-25s | %25s\n", i, t.Track.Name, strings.Join(artists, ", "))
 		}
 		fmt.Println("returning")
 		return
 	}
+
 	name := concat(args)
 	results, err := getPlaylists()
 	if err != nil {
@@ -78,16 +82,19 @@ func showPlaylist(args []string) {
 				fmt.Printf("%s has no tracks in it\n", pl.Name)
 				return
 			}
+			fmt.Printf(" %-2s | %-25s | %25s\n",
+				"no", "title", "artist")
+
 			for i, t := range tracks.Tracks {
 				if i == 40 {
 					fmt.Println("to see more tracks, use `edit`")
 					return
 				}
-				artists := ""
+				var artists []string
 				for _, art := range t.Track.Artists {
-					artists += art.Name + ", "
+					artists = append(artists, art.Name)
 				}
-				fmt.Printf("%d- %s by %s\n", i, t.Track.Name, artists)
+				fmt.Printf("#%-2d | %-25s | %25s\n", i, t.Track.Name, strings.Join(artists, ", "))
 			}
 		}
 	}

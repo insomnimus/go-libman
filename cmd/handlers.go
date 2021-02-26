@@ -83,6 +83,12 @@ func parsePlayerCommand(s string) {
 		show(fields[1:])
 	case "show", "sh":
 		show(fields[1:])
+	case "prompt":
+		if len(fields) == 1 {
+			fmt.Println("usage: 'prompt <text>'")
+			return
+		}
+		setPrompt(fields[1:]...)
 	default:
 		fmt.Printf("unknown command %q\n", fields[0])
 	}

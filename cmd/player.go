@@ -580,8 +580,9 @@ func playUserPlaylist(args []string) {
 	pls := page.Playlists
 
 	if len(args) == 0 {
+		fmt.Println(" #  | playlist")
 		for i, p := range pls {
-			fmt.Printf("%d- %s\n", i, p.Name)
+			fmt.Printf("#%-2d | %s\n", i, p.Name)
 		}
 		fmt.Printf("play which one? (0-%d), blank or -1 to cancel:\n", len(pls)-1)
 		input := ""
@@ -668,8 +669,9 @@ func chooseDevice() {
 		fmt.Println("no device detected")
 		return
 	}
+	fmt.Printf(" %-2s | %-20s | active\n", "no", "device name")
 	for i, device := range devices {
-		fmt.Printf("%d- %s (active=%t)\n", i, device.Name, device.Active)
+		fmt.Printf("#%-2d | %-20s | %t\n", i, device.Name, device.Active)
 	}
 	fmt.Println("choose a device, enter blank or -1 to return")
 	var input string

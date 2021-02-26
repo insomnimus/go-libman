@@ -137,11 +137,12 @@ func show(args []string) {
 }
 
 func (rec *Recommendation) Show() {
+	fmt.Printf(" %-2s | %-25s | %25s\n", "no", "track", "artist")
 	for i, t := range rec.Tracks {
 		if i == 25 {
 			break
 		}
-		fmt.Printf("%d- %s\n", i, t)
+		fmt.Printf("#%-2d | %-25s | %25s\n", i, t.Name, strings.Join(t.Artists, ", "))
 	}
 	if len(rec.Tracks) > 25 {
 		fmt.Printf("only showing 25 out of %d, though rest is also playable\n", len(rec.Tracks))

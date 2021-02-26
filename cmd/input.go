@@ -76,3 +76,10 @@ func concat(args []string) string {
 	}
 	return x[1:]
 }
+
+func setPrompt(args ...string) {
+	if len(args) == 0 {
+		return
+	}
+	PROMPT = concat(args) + " "
+}
