@@ -124,11 +124,17 @@ func playerHelp(args ...string) {
 	#save/add [playlist name]
 	save currently playing to a playlist
 	
+	#remove/rm [from]
+	remove the currently playing track from a playlist
+	
 	#playlists/pl [playlist name]
 	play one of your playlists
 	
 	#create/new
 	create a new playlist
+	
+	#delete/del
+	delete a playlist
 	
 	#device
 	choose a playback device
@@ -218,6 +224,7 @@ func playerHelp(args ...string) {
 		if called with no arguments, shows currently playing track
 		if called with arguments;
 		if the argument is "rec", shows the most recent recommendations list
+		if the argument is any of "playlist", "pl" or "playlists"; lists your playlists
 		otherwise shows one of your playlists contents
 		examples:
 		
