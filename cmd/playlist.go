@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/zmb3/spotify"
 	"log"
-	"os"
+	"strconv"
 	"strings"
 )
 
@@ -26,7 +26,7 @@ func getPlaylists() ([]*Playlist, error) {
 func listPlaylists() {
 	pls, err := getPlaylists()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		log.Println(err)
 		return
 	}
 	fmt.Printf(" %-2s | %35s\n", "no", "playlist")
@@ -43,7 +43,7 @@ func showPlaylist(args []string) {
 		}
 		results, err := client.GetPlaylistTracks(selectedSimple.ID)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "error fetching the tracks for %s: %s\n", selectedSimple.Name, err)
+			log.Printf("error fetching the tracks for %s: %s\n", selectedSimple.Name, err)
 			return
 		}
 		if len(results.Tracks) == 0 {
@@ -69,14 +69,14 @@ func showPlaylist(args []string) {
 	name := concat(args)
 	results, err := getPlaylists()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error fetching playlists: %s\n", err)
+		log.Printf("error fetching playlists: %s\n", err)
 		return
 	}
 	for _, pl := range results {
 		if strings.EqualFold(pl.Name, name) {
 			tracks, err := client.GetPlaylistTracks(spotify.ID(pl.ID))
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "error fetching the tracks for %s: %s\n", pl.Name, err)
+				log.Printf("error fetching the tracks for %s: %s\n", pl.Name, err)
 				return
 			}
 			if len(tracks.Tracks) == 0 {
@@ -101,8 +101,71 @@ func showPlaylist(args []string) {
 	}
 }
 
-func deletePlaylist() {
-	fmt.Println("not supported yet")
+func deletePlaylist(args []string) {
+	page, err := client.CurrentUsersPlaylists()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	if len(page.Playlists) == 0 {
+		fmt.Println("you don't seem to have any playlists")
+		return
+	}
+	if len(args) == 0 {
+		pls := page.Playlists
+		fmt.Printf(" %-2s | %-25s\n", "no", "playlist name")
+		for i, p := range pls {
+			fmt.Printf("#%-2d | %s\n", i, p.Name)
+		}
+		fmt.Printf("delete a playlist (0-%d):", len(pls)-1)
+		var input string
+		for {
+			input = prompt()
+			if input == "" || input == "-1" {
+				fmt.Println("cancelled")
+				return
+			}
+			n, err := strconv.Atoi(input)
+			if err != nil {
+				fmt.Println("invalid input, type again:")
+				continue
+			}
+			if n < 0 || n >= len(pls) {
+				fmt.Printf("please enter a number between 0 and %d\n", len(pls)-1)
+				continue
+			}
+			fmt.Printf("this will remove %s, do  you want to continue? y/n:\n", pls[n].Name)
+			if !yesOrNo() {
+				fmt.Println("cancelled")
+				return
+			}
+			err = client.UnfollowPlaylist(spotify.ID(pls[n].Owner.ID), pls[n].ID)
+			if err != nil {
+				log.Printf("error removing playlist: %s\n", err)
+				return
+			}
+			fmt.Printf("removed playlist %s\n", pls[n].Name)
+			return
+		}
+	}
+	name := concat(args)
+	for _, p := range page.Playlists {
+		if strings.EqualFold(p.Name, name) {
+			fmt.Printf("this will remove %s, do you want tocontinue? y/n:", p.Name)
+			if !yesOrNo() {
+				fmt.Println("cancelled")
+				return
+			}
+			err := client.UnfollowPlaylist(spotify.ID(p.Owner.ID), p.ID)
+			if err != nil {
+				log.Printf("error removing playlist: %s\n", err)
+				return
+			}
+			fmt.Printf("removed playlist %s\n", p.Name)
+			return
+		}
+	}
+	fmt.Printf("you do not seem to have any playlist by the name %q\n", name)
 }
 
 func getSimplePlaylists() ([]spotify.SimplePlaylist, error) {

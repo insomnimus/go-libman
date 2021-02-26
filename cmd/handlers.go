@@ -91,6 +91,8 @@ func parsePlayerCommand(s string) {
 		setPrompt(fields[1:]...)
 	case "remove", "rm":
 		removeCurrentlyPlaying(fields[1:])
+	case "del", "delete", "unfollow":
+		deletePlaylist(fields[1:])
 	default:
 		fmt.Printf("unknown command %q\n", fields[0])
 	}
@@ -263,6 +265,10 @@ func playerHelp(args ...string) {
 	remove currently playing track from a playlist
 	if the playlist name is omitted, the last played playlist will be assumed
 	this command does not prompt for confirmation`)
+	case "del", "delete", "unfollow":
+		p(`#delete (del) [playlist name]
+	deletes/unfollows a playlist
+	if the name is omitted, you will be promptted to choose from a list of your playlists`)
 	default:
 		p("unknown command %q", arg)
 	}

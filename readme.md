@@ -14,7 +14,6 @@ implemented:
 
 Not yet implemented:
 
--	Deleting/ unfollowing a playlist.
 -	View/ edit/ listen to your "favourites" folder.
 
 Maybe will get implemented:
