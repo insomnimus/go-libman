@@ -73,7 +73,7 @@ func initPlayer() {
 func saveCurrentlyPlaying(args []string) {
 	playingTrack, err := currentlyPlayingTrack()
 	if err != nil {
-		fmt.Printf("failed to fetch currently playing info: %s\n", err)
+		log.Println(err)
 		return
 	}
 	if len(args) == 0 {
@@ -296,7 +296,7 @@ func playerCleanup() {
 func showCurrentlyPlaying() {
 	tr, err := currentlyPlayingTrack()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		log.Println(err)
 		return
 	}
 	fmt.Printf("currently playing %s\nshuffle=%t repeat=%s\n", tr, shuffleState, repeatState)
@@ -829,7 +829,10 @@ func refreshPlayer() {
 }
 
 func playFavourites() {
-	page, err := client.CurrentUsersTracks()
+	limit:= 50
+	page, err := client.CurrentUsersTracksOpt(&spotify.Options{
+		Limit: &limit,
+	})
 	if err != nil {
 		log.Println(err)
 		return

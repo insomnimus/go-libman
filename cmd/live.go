@@ -44,6 +44,7 @@ var (
 )
 
 var (
+// TODO: remove this soon
 	simplePlaylists []spotify.SimplePlaylist
 	selectedSimple  *spotify.SimplePlaylist
 )

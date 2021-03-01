@@ -155,7 +155,10 @@ func (rec *Recommendation) Show() {
 }
 
 func showLibrary() {
-	page, err := client.CurrentUsersTracks()
+	limit:= 50
+	page, err := client.CurrentUsersTracksOpt(&spotify.Options{
+		Limit: &limit,
+	})
 	if err != nil {
 		log.Println(err)
 		return
