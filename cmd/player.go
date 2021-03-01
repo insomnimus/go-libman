@@ -109,6 +109,16 @@ func saveCurrentlyPlaying(args []string) {
 		}
 	}
 	name := concat(args)
+	switch strings.ToLower(name) {
+	case "lib", "fav", "library", "liked songs":
+		err = client.AddTracksToLibrary(spotify.ID(playingTrack.ID))
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		fmt.Printf("added %s to the library\n", playingTrack.Name)
+		return
+	}
 	pls, err := getPlaylists()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -336,6 +346,8 @@ func (sr *SearchResult) Play() {
 			fmt.Printf("error: %s\n", err)
 			return
 		}
+	case "library":
+		opt.URIs = sr.URIs
 	default:
 		opt.PlaybackContext = sr.URI
 	}
@@ -573,6 +585,13 @@ func searchAll(arg string) (SearchResults, error) {
 }
 
 func playUserPlaylist(args []string) {
+	if len(args) > 0 {
+		switch strings.ToLower(concat(args)) {
+		case "fav", "liked songs", "favourites", "favorites", "library", "lib":
+			playFavourites()
+			return
+		}
+	}
 	page, err := client.CurrentUsersPlaylists()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error fetching users playlists: %s\n", err)
@@ -807,4 +826,29 @@ func refreshPlayer() {
 		repeatState = plState.RepeatState
 		isPlaying = plState.Playing
 	}
+}
+
+func playFavourites() {
+	page, err := client.CurrentUsersTracks()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	if page == nil || len(page.Tracks) == 0 {
+		fmt.Println("you have no saved tracks in your library")
+		return
+	}
+	tracks := page.Tracks
+	var pl []spotify.URI
+	for _, tr := range tracks {
+		pl = append(pl, tr.URI)
+	}
+	lastPl = &Playlist{Name: "user_library"}
+	tmp := &SearchResult{
+		Name:  "library",
+		URIs:  pl,
+		Owner: "you",
+		Type:  "library",
+	}
+	tmp.Play()
 }

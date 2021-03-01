@@ -195,17 +195,25 @@ func getPlaylist(name string) (*Playlist, error) {
 }
 
 func removeCurrentlyPlaying(args []string) {
-
 	name := concat(args)
+	track, err := currentlyPlayingTrack()
+	if err != nil {
+		log.Printf("could not fetch currently playing: %s\n", err)
+		return
+	}
 	switch strings.ToLower(name) {
 	case "":
 		if lastPl == nil {
 			fmt.Println("no playlist log found, returning")
 			return
 		}
-		track, err := currentlyPlayingTrack()
-		if err != nil {
-			log.Printf("could not fetch currently playing: %s\n", err)
+		if lastPl.Name == "user_library" {
+			err = client.RemoveTracksFromLibrary(spotify.ID(track.ID))
+			if err != nil {
+				log.Println(err)
+				return
+			}
+			fmt.Printf("removed %s from library\n", track.Name)
 			return
 		}
 		_, err = client.RemoveTracksFromPlaylist(spotify.ID(lastPl.ID), spotify.ID(track.ID))
@@ -215,15 +223,17 @@ func removeCurrentlyPlaying(args []string) {
 		}
 		fmt.Printf("removed %s from %s\n", track.Name, lastPl.Name)
 		return
-		// TODO: implement fave folder
-		//case "fav", "favourites":
-	}
-	pl, err := getPlaylist(name)
-	if err != nil {
-		log.Println(err)
+	// TODO: implement fave folder
+	case "fav", "favourites", "favorites", "lib", "library":
+		err = client.RemoveTracksFromLibrary(spotify.ID(track.ID))
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		fmt.Printf("removed %s from library\n", track.Name)
 		return
 	}
-	track, err := currentlyPlayingTrack()
+	pl, err := getPlaylist(name)
 	if err != nil {
 		log.Println(err)
 		return

@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/zmb3/spotify"
+	"log"
 	"math/rand"
 	"strings"
 )
@@ -133,6 +134,8 @@ func show(args []string) {
 		recommendations.Show()
 	case "pl", "playlists", "playlist":
 		listPlaylists()
+	case "lib", "library", "fav", "favourites", "favorites", "liked songs":
+		showLibrary()
 	default:
 		showPlaylist(args)
 	}
@@ -148,5 +151,26 @@ func (rec *Recommendation) Show() {
 	}
 	if len(rec.Tracks) > 25 {
 		fmt.Printf("only showing 25 out of %d, though rest is also playable\n", len(rec.Tracks))
+	}
+}
+
+func showLibrary() {
+	page, err := client.CurrentUsersTracks()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	if page == nil || len(page.Tracks) == 0 {
+		fmt.Println("you have no saved tracks in your library")
+		return
+	}
+	fmt.Printf(" %-2s | %-25s | %25s\n", "no", "track", "artist")
+	var artists []string
+	for i, tr := range page.Tracks {
+		artists = []string{}
+		for _, a := range tr.Artists {
+			artists = append(artists, a.Name)
+		}
+		fmt.Printf("#%-2d | %-25s | %25s\n", i, tr.Name, strings.Join(artists, ", "))
 	}
 }
