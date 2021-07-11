@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/insomnimus/libman/cmd"
-	"github.com/insomnimus/libman/userdir"
+	"github.com/insomnimus/go-libman/cmd"
+	"github.com/insomnimus/go-libman/userdir"
 	"os"
 	"strings"
 )

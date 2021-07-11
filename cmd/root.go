@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/boltdb/bolt"
-	"github.com/insomnimus/libman/userdir"
+	"github.com/insomnimus/go-libman/userdir"
 	"github.com/zmb3/spotify"
 	"log"
 	"os"

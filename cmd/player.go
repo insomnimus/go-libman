@@ -829,7 +829,7 @@ func refreshPlayer() {
 }
 
 func playFavourites() {
-	limit:= 50
+	limit := 50
 	page, err := client.CurrentUsersTracksOpt(&spotify.Options{
 		Limit: &limit,
 	})

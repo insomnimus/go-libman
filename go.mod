@@ -1,4 +1,4 @@
-module github.com/insomnimus/libman
+module github.com/insomnimus/go-libman
 
 go 1.16
 

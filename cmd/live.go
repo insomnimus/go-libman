@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/boltdb/bolt"
-	"github.com/insomnimus/libman/userdir"
+	"github.com/insomnimus/go-libman/userdir"
 	"golang.org/x/oauth2"
 	"log"
 	"net/http"
@@ -44,7 +44,7 @@ var (
 )
 
 var (
-// TODO: remove this soon
+	// TODO: remove this soon
 	simplePlaylists []spotify.SimplePlaylist
 	selectedSimple  *spotify.SimplePlaylist
 )
