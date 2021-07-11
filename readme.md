@@ -1,5 +1,12 @@
 # libman
 
+## Authors Note
+
+Since this project is one of my earlier go apps, the code is very disorganized and messy. 
+Instead of fixing the code, i wanted to rewrite libman in rust, please check [this link](https://github.com/insomnimus/libman) out. 
+
+On another note, I use libman daily, so it's ready to use but i'm not happy with the code (app works great).
+
 libman is a CLI client for controlling your Spotify playback, it also lets you manage your playlists.
 
 ## Features
@@ -11,9 +18,6 @@ implemented:
 -	Control playback, volume and device.
 -	Create/ edit your playlists.
 -	Search for songs, playlists, artists and albums.
-
-Not yet implemented:
-
 -	View/ edit/ listen to your "favourites" folder.
 
 Maybe will get implemented:
