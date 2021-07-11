@@ -28,13 +28,16 @@ Maybe will get implemented:
 
 Since libman v0.12.0, libman needs go 1.16 and above to be compiled.
 
-	go get -u -v github.com/insomnimus/libman/...
+`go install github.com/insomnimus/go-libman@latest`
 
-Go should install libman for you, if it doesn't, try these steps:
+If the above doesn't work, try cloning the repo first:
 
--	`git clone --recurse  https://github.com/insomnimus/libman`
--	`cd libman`
--	`go install`
+```sh
+git clone https://github.com/insomnimus/go-libman
+cd go-libman
+git checkout dev
+go install
+```
 
 After the installation, you probably should configure libman.
 
