@@ -51,4 +51,4 @@ If you don't want to use environment variables, run `libman config` for the loca
 
 You're ready, start libman by calling it bare:
 
-	libman
+`go-libman`
